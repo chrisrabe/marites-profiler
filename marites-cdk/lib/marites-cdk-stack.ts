@@ -7,7 +7,7 @@ import {
   Role as IAMRole,
   ServicePrincipal,
 } from "aws-cdk-lib/aws-iam";
-import { Bucket as S3Bucket, LifecycleRule } from "aws-cdk-lib/aws-s3";
+import { Bucket, Bucket as S3Bucket, LifecycleRule } from "aws-cdk-lib/aws-s3";
 import config from "./stack-config";
 
 export class MaritesCdkStack extends Stack {
@@ -19,27 +19,19 @@ export class MaritesCdkStack extends Stack {
 
     const devGroup = this.createDeveloperUserGroup(config.minUserPolicies);
 
-    // Grant read and write access to buckets
     inputBucket.grantReadWrite(devGroup);
     outputBucket.grantReadWrite(devGroup);
 
-    // Create all users in dev group
     for (const user of config.initialUsers) {
       this.createUser(user, [devGroup]);
     }
 
-    // Set up resource policies for AWS Comprehend
-    new IAMRole(this, "comprehend-data-access-role", {
-      roleName: "Role-Comprehend-DataAccess",
-      assumedBy: new ServicePrincipal("comprehend.amazonaws.com"),
-      managedPolicies: [
-        ManagedPolicy.fromAwsManagedPolicyName(
-          "ComprehendDataAccessRolePolicy"
-        ),
-      ],
-    });
+    this.createComprehendServiceRole([inputBucket, outputBucket]);
 
-    // Set up resource policies for AWS lambda
+    this.createLambdaServiceRole(inputBucket, outputBucket);
+  }
+
+  private createLambdaServiceRole(inputBucket: Bucket, outputBucket: Bucket) {
     const lambdaRole = new IAMRole(this, "marites-lambda-role", {
       roleName: "Role-Lambda-Marites",
       assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
@@ -50,6 +42,16 @@ export class MaritesCdkStack extends Stack {
 
     inputBucket.grantWrite(lambdaRole); // push CSVs into input bucket
     outputBucket.grantRead(lambdaRole); // read output CSVs from output bucket
+  }
+
+  private createComprehendServiceRole(buckets: Bucket[]) {
+    const dataAccessRole = new IAMRole(this, "comprehend-data-access-role", {
+      roleName: "Role-Comprehend-DataAccess",
+      assumedBy: new ServicePrincipal("comprehend.amazonaws.com"),
+    });
+    for (const bucket of buckets) {
+      bucket.grantReadWrite(dataAccessRole);
+    }
   }
 
   private createDeveloperUserGroup(policies: string[]) {
