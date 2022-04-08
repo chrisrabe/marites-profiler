@@ -6,9 +6,8 @@ import {
   User as IAMUser,
   Role as IAMRole,
   ServicePrincipal,
-  IGrantable,
 } from "aws-cdk-lib/aws-iam";
-import { Bucket, Bucket as S3Bucket, LifecycleRule } from "aws-cdk-lib/aws-s3";
+import { Bucket as S3Bucket, LifecycleRule } from "aws-cdk-lib/aws-s3";
 import config from "./stack-config";
 
 export class MaritesCdkStack extends Stack {
@@ -21,8 +20,8 @@ export class MaritesCdkStack extends Stack {
     const devGroup = this.createDeveloperUserGroup(config.minUserPolicies);
 
     // Grant read and write access to buckets
-    this.grantBucketAccess(inputBucket, devGroup);
-    this.grantBucketAccess(outputBucket, devGroup);
+    inputBucket.grantReadWrite(devGroup);
+    outputBucket.grantReadWrite(devGroup);
 
     // Create all users in dev group
     for (const user of config.initialUsers) {
@@ -32,7 +31,7 @@ export class MaritesCdkStack extends Stack {
     // Set up resource policies for AWS Comprehend
     new IAMRole(this, "comprehend-data-access-role", {
       roleName: "Role-Comprehend-DataAccess",
-      assumedBy: new ServicePrincipal("comprehend.amazon.aws"),
+      assumedBy: new ServicePrincipal("comprehend.amazonaws.com"),
       managedPolicies: [
         ManagedPolicy.fromAwsManagedPolicyName(
           "ComprehendDataAccessRolePolicy"
@@ -43,7 +42,7 @@ export class MaritesCdkStack extends Stack {
     // Set up resource policies for AWS lambda
     const lambdaRole = new IAMRole(this, "marites-lambda-role", {
       roleName: "Role-Lambda-Marites",
-      assumedBy: new ServicePrincipal("lambda.amazon.aws"),
+      assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
       managedPolicies: config.minUserPolicies.map((policy) =>
         ManagedPolicy.fromAwsManagedPolicyName(policy)
       ),
@@ -51,11 +50,6 @@ export class MaritesCdkStack extends Stack {
 
     inputBucket.grantWrite(lambdaRole); // push CSVs into input bucket
     outputBucket.grantRead(lambdaRole); // read output CSVs from output bucket
-  }
-
-  private grantBucketAccess(bucket: Bucket, grantable: IGrantable) {
-    bucket.grantReadWrite(grantable);
-    bucket.grantDelete(grantable);
   }
 
   private createDeveloperUserGroup(policies: string[]) {
