@@ -1,13 +1,8 @@
-# AWS Infra
+# Welcome to your CDK TypeScript project
 
-## Overview
-This application uses the AWS CDK to generate your AWS infrastructure
-components through a single command.
+This is a blank project for TypeScript development with CDK.
 
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
-
-## Before running
-- Install AWS CLI
 
 ## Useful commands
 

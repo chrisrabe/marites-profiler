@@ -1,13 +1,13 @@
 // import * as cdk from 'aws-cdk-lib';
 // import { Template } from 'aws-cdk-lib/assertions';
-// import * as AwsInfra from '../lib/aws-infra-stack';
+// import * as MaritesCdk from '../lib/marites-cdk-stack';
 
 // example test. To run these tests, uncomment this file along with the
-// example resource in lib/aws-infra-stack.ts
+// example resource in lib/marites-cdk-stack.ts
 test('SQS Queue Created', () => {
 //   const app = new cdk.App();
 //     // WHEN
-//   const stack = new AwsInfra.AwsInfraStack(app, 'MyTestStack');
+//   const stack = new MaritesCdk.MaritesCdkStack(app, 'MyTestStack');
 //     // THEN
 //   const template = Template.fromStack(stack);
 

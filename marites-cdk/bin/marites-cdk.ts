@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { AwsInfraStack } from '../lib/aws-infra-stack';
+import { MaritesCdkStack } from '../lib/marites-cdk-stack';
 
 const app = new cdk.App();
-new AwsInfraStack(app, 'AwsInfraStack', {
+new MaritesCdkStack(app, 'MaritesCdkStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
