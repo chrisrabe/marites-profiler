@@ -26,7 +26,12 @@ export class MaritesCdkStack extends Stack {
       this.createUser(user, [devGroup]);
     }
 
-    this.createComprehendServiceRole([inputBucket, outputBucket]);
+    const dataAccessRole = this.createComprehendServiceRole([
+      inputBucket,
+      outputBucket,
+    ]);
+
+    dataAccessRole.grantPassRole(devGroup);
 
     this.createLambdaServiceRole(inputBucket, outputBucket);
   }
@@ -52,6 +57,7 @@ export class MaritesCdkStack extends Stack {
     for (const bucket of buckets) {
       bucket.grantReadWrite(dataAccessRole);
     }
+    return dataAccessRole;
   }
 
   private createDeveloperUserGroup(policies: string[]) {
