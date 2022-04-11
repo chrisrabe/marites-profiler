@@ -9,7 +9,7 @@ interface NewsArticleProps {
 
 const NewsArticle: React.FC<NewsArticleProps> = ({ imageUrl, title, date }) => {
   return (
-    <div className="flex flex-col">
+    <div>
       <div className="object-cover w-96 h-48 relative">
         <Image
           src={imageUrl}

@@ -2,6 +2,7 @@ import React from "react";
 import AppLogo from "components/common/AppLogo";
 import Container from "components/common/Container";
 import NewsArticle from "components/common/NewsArticle";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 const sampleNews = {
   title: "Amazing programmer wins Tigergraph hacking challenge!",
@@ -14,11 +15,43 @@ const GeneralNews: React.FC = () => {
   return (
     <Container>
       <AppLogo variant="news" />
-      <NewsArticle
-        title={sampleNews.title}
-        imageUrl={sampleNews.imageUrl}
-        date={sampleNews.date}
-      />
+      <Swiper spaceBetween={50} slidesPerView={2}>
+        <SwiperSlide>
+          <NewsArticle
+            imageUrl={sampleNews.imageUrl}
+            title={sampleNews.title}
+            date={sampleNews.date}
+          />
+        </SwiperSlide>
+        <SwiperSlide>
+          <NewsArticle
+            imageUrl={sampleNews.imageUrl}
+            title={sampleNews.title}
+            date={sampleNews.date}
+          />
+        </SwiperSlide>
+        <SwiperSlide>
+          <NewsArticle
+            imageUrl={sampleNews.imageUrl}
+            title={sampleNews.title}
+            date={sampleNews.date}
+          />
+        </SwiperSlide>
+        <SwiperSlide>
+          <NewsArticle
+            imageUrl={sampleNews.imageUrl}
+            title={sampleNews.title}
+            date={sampleNews.date}
+          />
+        </SwiperSlide>
+        <SwiperSlide>
+          <NewsArticle
+            imageUrl={sampleNews.imageUrl}
+            title={sampleNews.title}
+            date={sampleNews.date}
+          />
+        </SwiperSlide>
+      </Swiper>
     </Container>
   );
 };
