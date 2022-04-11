@@ -1,1 +1,1 @@
-export { default } from "./GeneralNews";
+export { default } from "./container";
