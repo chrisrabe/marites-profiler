@@ -2,7 +2,7 @@ import React from "react";
 import AppLogo from "components/common/AppLogo";
 import Container from "components/common/Container";
 import NewsArticle from "components/common/NewsArticle";
-import { Swiper, SwiperSlide } from "swiper/react";
+import Carousel from "components/ui/Carousel";
 
 const sampleNews = {
   title: "Amazing programmer wins Tigergraph hacking challenge!",
@@ -15,43 +15,28 @@ const GeneralNews: React.FC = () => {
   return (
     <Container>
       <AppLogo variant="news" />
-      <Swiper spaceBetween={50} slidesPerView={2}>
-        <SwiperSlide>
-          <NewsArticle
-            imageUrl={sampleNews.imageUrl}
-            title={sampleNews.title}
-            date={sampleNews.date}
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <NewsArticle
-            imageUrl={sampleNews.imageUrl}
-            title={sampleNews.title}
-            date={sampleNews.date}
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <NewsArticle
-            imageUrl={sampleNews.imageUrl}
-            title={sampleNews.title}
-            date={sampleNews.date}
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <NewsArticle
-            imageUrl={sampleNews.imageUrl}
-            title={sampleNews.title}
-            date={sampleNews.date}
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <NewsArticle
-            imageUrl={sampleNews.imageUrl}
-            title={sampleNews.title}
-            date={sampleNews.date}
-          />
-        </SwiperSlide>
-      </Swiper>
+      <Carousel>
+        <NewsArticle
+          imageUrl={sampleNews.imageUrl}
+          title={sampleNews.title}
+          date={sampleNews.date}
+        />
+        <NewsArticle
+          imageUrl={sampleNews.imageUrl}
+          title={sampleNews.title}
+          date={sampleNews.date}
+        />
+        <NewsArticle
+          imageUrl={sampleNews.imageUrl}
+          title={sampleNews.title}
+          date={sampleNews.date}
+        />
+        <NewsArticle
+          imageUrl={sampleNews.imageUrl}
+          title={sampleNews.title}
+          date={sampleNews.date}
+        />
+      </Carousel>
     </Container>
   );
 };
