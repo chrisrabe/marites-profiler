@@ -58,6 +58,9 @@ const Instructions: React.FC = () => {
         onAutoplay={(swiper) => {
           setActiveIndex(swiper.activeIndex);
         }}
+        onSlideChange={(swiper) => {
+          setActiveIndex(swiper.activeIndex);
+        }}
       >
         {steps.map((step) => (
           <SwiperSlide key={step.text}>
