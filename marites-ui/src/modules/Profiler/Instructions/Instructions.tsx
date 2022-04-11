@@ -17,8 +17,15 @@ const steps = [
     keywords: ["personalise your experience"],
   },
   {
-    text: "This tool can assist businesses in automating the personalisation processes when the user registers for their site.",
+    text: "Our profiler can assist businesses in automating the personalisation processes when the user registers for their site.",
     keywords: ["automating the personalisation processes"],
+  },
+  {
+    text: "This results in better user experience, and more efficient advertising and recommendations as soon as a user registers.",
+    keywords: [
+      "better user experience",
+      "efficient advertising and recommendations",
+    ],
   },
   {
     text: "To get started, please enter your Twitter username",
@@ -41,14 +48,15 @@ const Instructions: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <div className="my-28 mx-48">
+    <div className="my-12 mx-2 md:my-28 md:mx-32 lg:mx-48">
       <h2 className="text-center mb-8 font-medium text-sm text-gray-300">
         How it works
       </h2>
       <Swiper
+        className="max-w-2xl"
         modules={[Autoplay]}
         centeredSlides
-        autoplay={{ delay: 6000 }}
+        autoplay={{ delay: 7000 }}
         onAutoplay={(swiper) => {
           setActiveIndex(swiper.activeIndex);
         }}
@@ -62,7 +70,7 @@ const Instructions: React.FC = () => {
           </SwiperSlide>
         ))}
       </Swiper>
-      <div className="inline-flex space-x-2 w-full items-center justify-center mt-6">
+      <div className="inline-flex space-x-2 w-full items-center justify-center mt-2 md:mt-6">
         {new Array(steps.length).fill(0).map((_, i) => (
           <div
             key={`circle-${i}`}
