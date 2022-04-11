@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css/autoplay";
 import { Autoplay } from "swiper";
+
+import "swiper/css/autoplay";
 
 const steps = [
   {
@@ -10,22 +11,19 @@ const steps = [
   },
   {
     text: "This means that our profiler extracts subjects and topics from your posts and identifies how you feel about them.",
-    keywords: ["subjects and topics", "how you feel about them"],
+    keywords: ["subjects and topics", "identifies how you feel about them"],
   },
   {
     text: "After, we personalise your experience by providing articles that are related to your interests.",
     keywords: ["personalise your experience"],
   },
   {
-    text: "Our profiler can assist businesses in automating the personalisation processes when the user registers for their site.",
+    text: "Our profiler can assist businesses in automating the personalisation processes.",
     keywords: ["automating the personalisation processes"],
   },
   {
-    text: "This results in better user experience, and more efficient advertising and recommendations as soon as a user registers.",
-    keywords: [
-      "better user experience",
-      "efficient advertising and recommendations",
-    ],
+    text: "This results in better user experience, and instant customised recommendations as soon as a user registers.",
+    keywords: ["better user experience", "instant customised recommendations"],
   },
   {
     text: "To get started, please enter your Twitter username",

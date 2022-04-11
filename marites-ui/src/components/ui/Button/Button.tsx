@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 interface ButtonProps {
   onClick?: () => void;
   disabled?: boolean;
-  variant?: "default" | "underline" | "outlined";
+  variant?: "default" | "underline" | "outlined" | "default_purple";
   children: ReactNode;
 }
 
@@ -12,6 +12,7 @@ const buttonStyleMap = {
   default: "bg-red-500 hover:bg-red-500 rounded text-white",
   underline: "text-gray-100 text-sm underline",
   outlined: "border border-red-600 text-red-500 rounded",
+  default_purple: "bg-purple-500 hover:bg-purple-500 rounded text-white",
 };
 
 const Button: React.FC<ButtonProps> = ({
