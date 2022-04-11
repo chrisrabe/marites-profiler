@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 interface NewsArticleProps {
   imageUrl: string;
@@ -9,7 +10,11 @@ interface NewsArticleProps {
 
 const NewsArticle: React.FC<NewsArticleProps> = ({ imageUrl, title, date }) => {
   return (
-    <div>
+    <motion.div
+      whileHover={{ scale: 0.95 }}
+      whileTap={{ scale: 0.9 }}
+      className="cursor-pointer"
+    >
       <div className="object-cover w-96 h-48 relative">
         <Image
           src={imageUrl}
@@ -26,7 +31,7 @@ const NewsArticle: React.FC<NewsArticleProps> = ({ imageUrl, title, date }) => {
           {date}
         </p>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
