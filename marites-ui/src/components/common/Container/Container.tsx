@@ -5,9 +5,7 @@ interface ContainerProps {
 }
 
 const Container: React.FC<ContainerProps> = ({ children }) => (
-  <div className="p-4 sm:p-12 md:px-24 md:py-12 lg:px-32 lg:py-12">
-    {children}
-  </div>
+  <div className="px-4 sm:px-12 py-12 md:px-24 lg:px-32">{children}</div>
 );
 
 export default Container;

@@ -15,7 +15,22 @@ const GeneralNews: React.FC = () => {
   return (
     <Container>
       <AppLogo variant="news" />
-      <Carousel>
+      <Carousel title="Recent News">
+        <NewsArticle
+          imageUrl={sampleNews.imageUrl}
+          title={sampleNews.title}
+          date={sampleNews.date}
+        />
+        <NewsArticle
+          imageUrl={sampleNews.imageUrl}
+          title={sampleNews.title}
+          date={sampleNews.date}
+        />
+        <NewsArticle
+          imageUrl={sampleNews.imageUrl}
+          title={sampleNews.title}
+          date={sampleNews.date}
+        />
         <NewsArticle
           imageUrl={sampleNews.imageUrl}
           title={sampleNews.title}
