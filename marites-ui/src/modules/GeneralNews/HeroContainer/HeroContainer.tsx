@@ -8,7 +8,7 @@ const HeroContainer: React.FC = () => {
   const router = useRouter();
 
   return (
-    <div className="mx-4 md:mx-12 lg:mx-24 my-12 max-w-2xl">
+    <div className="mx-4 my-12 md:mx-12 lg:mx-24 md:my-20 max-w-2xl">
       <p className="text-4xl mb-8 font-light">
         <span className="font-medium text-red-500">Personalise</span> your news
         articles using your public profile through our{" "}
