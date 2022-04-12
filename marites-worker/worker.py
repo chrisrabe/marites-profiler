@@ -14,11 +14,10 @@ class Interval(Timer):
 delay = 60 * 30 # 30 minutes
 
 tg_host = os.environ.get("TG_HOST")
-tg_secret = os.environ.get("TG_SECRET")
-tg_graph = os.environ.get("TG_GRAPH")
+tg_password = os.environ.get("TG_PASSWORD")
 
 def get_secret():
-    tg.TigerGraphConnection(host=tg_host, graphname=tg_graph).getToken(tg_secret)[0]
+    tg.TigerGraphConnection(host=tg_host, password=tg_password).gsql('ls')
     time = datetime.now().strftime("%m-%d-%y %H:%M:%S")
     print("{} : Retrieved secret".format(time))
 
