@@ -1,0 +1,2 @@
+pyTigerGraph
+python-dotenv
