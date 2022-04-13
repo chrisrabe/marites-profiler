@@ -3,3 +3,4 @@ pandas
 python-dotenv
 boto3
 pyTigerGraph
+uuid
