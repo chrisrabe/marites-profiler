@@ -3,16 +3,22 @@ import { Construct } from "constructs";
 import {
   Group as IAMGroup,
   ManagedPolicy,
-  User as IAMUser,
   Role as IAMRole,
   ServicePrincipal,
+  User as IAMUser,
 } from "aws-cdk-lib/aws-iam";
-import { Bucket, Bucket as S3Bucket, LifecycleRule } from "aws-cdk-lib/aws-s3";
 import {
-  Function as LambdaFunction,
-  Runtime as LambdaRuntime,
+  Bucket as S3Bucket,
+  EventType,
+  LifecycleRule,
+} from "aws-cdk-lib/aws-s3";
+import {
   Code as LambdaCode,
+  Function as LambdaFunction,
+  IEventSource,
+  Runtime as LambdaRuntime,
 } from "aws-cdk-lib/aws-lambda";
+import { S3EventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import config from "./stack-config";
 import * as path from "path";
 
@@ -44,10 +50,43 @@ export class MaritesCdkStack extends Stack {
     const functionsDir = path.join(__dirname, "functions");
 
     // Create internal lambda functions
-    const inputTransform = new LambdaFunction(this, "input-transform", {
-      handler: "index.handler",
+
+    this.createLambdaFunction(
+      "input-transform",
+      path.join(functionsDir, "input-transform"),
+      lambdaRole,
+      [
+        new S3EventSource(inputBucket, {
+          events: [EventType.OBJECT_CREATED_PUT],
+          filters: [{ prefix: "tigergraph/", suffix: ".csv" }],
+        }),
+      ]
+    );
+
+    this.createLambdaFunction(
+      "output-transform",
+      path.join(functionsDir, "output-transform"),
+      lambdaRole,
+      [
+        new S3EventSource(outputBucket, {
+          events: [EventType.OBJECT_CREATED_PUT],
+          filters: [{ suffix: ".tar.gz" }],
+        }),
+      ]
+    );
+  }
+
+  private createLambdaFunction(
+    id: string,
+    codePath: string,
+    role: IAMRole,
+    events?: IEventSource[],
+    handler = "index.handler"
+  ) {
+    return new LambdaFunction(this, id, {
+      handler: handler,
       runtime: LambdaRuntime.PYTHON_3_9,
-      code: LambdaCode.fromAsset(path.join(functionsDir, "input-transform"), {
+      code: LambdaCode.fromAsset(codePath, {
         bundling: {
           image: LambdaRuntime.PYTHON_3_9.bundlingImage,
           command: [
@@ -57,11 +96,15 @@ export class MaritesCdkStack extends Stack {
           ],
         },
       }),
-      role: lambdaRole,
+      role,
+      events,
     });
   }
 
-  private createLambdaServiceRole(inputBucket: Bucket, outputBucket: Bucket) {
+  private createLambdaServiceRole(
+    inputBucket: S3Bucket,
+    outputBucket: S3Bucket
+  ) {
     const lambdaRole = new IAMRole(this, "marites-lambda-role", {
       roleName: "Role-Lambda-Marites",
       assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
@@ -75,7 +118,7 @@ export class MaritesCdkStack extends Stack {
     return lambdaRole;
   }
 
-  private createComprehendServiceRole(buckets: Bucket[]) {
+  private createComprehendServiceRole(buckets: S3Bucket[]) {
     const dataAccessRole = new IAMRole(this, "comprehend-data-access-role", {
       roleName: "Role-Comprehend-DataAccess",
       assumedBy: new ServicePrincipal("comprehend.amazonaws.com"),
