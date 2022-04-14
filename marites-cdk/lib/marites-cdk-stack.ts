@@ -8,7 +8,13 @@ import {
   ServicePrincipal,
 } from "aws-cdk-lib/aws-iam";
 import { Bucket, Bucket as S3Bucket, LifecycleRule } from "aws-cdk-lib/aws-s3";
+import {
+  Function as LambdaFunction,
+  Runtime as LambdaRuntime,
+  Code as LambdaCode,
+} from "aws-cdk-lib/aws-lambda";
 import config from "./stack-config";
+import * as path from "path";
 
 export class MaritesCdkStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -33,7 +39,26 @@ export class MaritesCdkStack extends Stack {
 
     dataAccessRole.grantPassRole(devGroup);
 
-    this.createLambdaServiceRole(inputBucket, outputBucket);
+    const lambdaRole = this.createLambdaServiceRole(inputBucket, outputBucket);
+
+    const functionsDir = path.join(__dirname, "functions");
+
+    // Create internal lambda functions
+    const inputTransform = new LambdaFunction(this, "input-transform", {
+      handler: "index.handler",
+      runtime: LambdaRuntime.PYTHON_3_9,
+      code: LambdaCode.fromAsset(path.join(functionsDir, "input-transform"), {
+        bundling: {
+          image: LambdaRuntime.PYTHON_3_9.bundlingImage,
+          command: [
+            "bash",
+            "-c",
+            "pip install -r requirements.txt -t /asset-output && cp -au . /asset-output",
+          ],
+        },
+      }),
+      role: lambdaRole,
+    });
   }
 
   private createLambdaServiceRole(inputBucket: Bucket, outputBucket: Bucket) {
@@ -45,8 +70,9 @@ export class MaritesCdkStack extends Stack {
       ),
     });
 
-    inputBucket.grantWrite(lambdaRole); // push CSVs into input bucket
-    outputBucket.grantRead(lambdaRole); // read output CSVs from output bucket
+    inputBucket.grantReadWrite(lambdaRole);
+    outputBucket.grantReadWrite(lambdaRole);
+    return lambdaRole;
   }
 
   private createComprehendServiceRole(buckets: Bucket[]) {
