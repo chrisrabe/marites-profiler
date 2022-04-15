@@ -8,6 +8,9 @@ const config = {
   // IAM configuration
   initialUsers: ["marites-user"],
   minUserPolicies: ["ComprehendFullAccess"],
+  // Lambda environment variables
+  tgHost: process.env.TG_HOST,
+  tgPassword: process.env.TG_PASSWORD
 };
 
 export default config;

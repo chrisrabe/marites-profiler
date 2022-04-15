@@ -51,6 +51,11 @@ export class MaritesCdkStack extends Stack {
 
     // Create internal lambda functions
 
+    const transformEnv = {
+      TG_HOST: config.tgHost ?? "",
+      TG_PASSWORD: config.tgPassword ?? "",
+    };
+
     this.createLambdaFunction(
       "input-transform",
       path.join(functionsDir, "input-transform"),
@@ -58,9 +63,10 @@ export class MaritesCdkStack extends Stack {
       [
         new S3EventSource(inputBucket, {
           events: [EventType.OBJECT_CREATED_PUT],
-          filters: [{ prefix: "tigergraph/", suffix: ".csv" }],
+          filters: [{ prefix: "tigergraph/", suffix: ".tar.gz" }],
         }),
-      ]
+      ],
+      transformEnv
     );
 
     this.createLambdaFunction(
@@ -72,7 +78,8 @@ export class MaritesCdkStack extends Stack {
           events: [EventType.OBJECT_CREATED_PUT],
           filters: [{ suffix: ".tar.gz" }],
         }),
-      ]
+      ],
+      transformEnv
     );
   }
 
@@ -81,6 +88,7 @@ export class MaritesCdkStack extends Stack {
     codePath: string,
     role: IAMRole,
     events?: IEventSource[],
+    environment?: Record<string, string>,
     handler = "index.handler"
   ) {
     return new LambdaFunction(this, id, {
@@ -98,6 +106,7 @@ export class MaritesCdkStack extends Stack {
       }),
       role,
       events,
+      environment,
     });
   }
 
