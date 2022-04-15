@@ -50,7 +50,20 @@ export class MaritesCdkStack extends Stack {
     const functionsDir = path.join(__dirname, "functions");
 
     // Create internal lambda functions
+    this.createTransformFunctions(
+      functionsDir,
+      lambdaRole,
+      inputBucket,
+      outputBucket
+    );
+  }
 
+  private createTransformFunctions(
+    functionsDir: string,
+    lambdaRole: IAMRole,
+    inputBucket: S3Bucket,
+    outputBucket: S3Bucket
+  ) {
     const transformEnv = {
       TG_HOST: config.tgHost ?? "",
       TG_PASSWORD: config.tgPassword ?? "",
