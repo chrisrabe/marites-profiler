@@ -21,7 +21,7 @@ tg_secret = os.environ.get("TG_SECRET")
 def map_result(data):
     json_data = json.loads(data)
     filename = json_data['File']
-    line_num = json_data['Line']
+    line_num = json_data['Line'] + 1
     tag = re.search('(.*)_(.*).txt', filename).group(2)
     
     line_id = '{}-{}'.format(line_num, tag)
