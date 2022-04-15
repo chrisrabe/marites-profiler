@@ -13,8 +13,6 @@ load_dotenv()
 
 print('Loading function')
 
-s3 = boto3.client('s3')
-
 tg_graph = "marites"
 tg_host = os.environ.get("TG_HOST")
 tg_password = os.environ.get("TG_PASSWORD")
@@ -56,12 +54,17 @@ def upsert_frames_to_tigergraph(users, following, posts):
         }
     )
 
+    print(f'Done. Upserted {user_vertices} user vertices')
+
+
     print('Creating post vertices...')
     post_vertices = conn.upsertVertexDataFrame(
         df=posts,
         vertexType='post',
         v_id='line_id'
     )
+
+    print(f'Done. Upserted {post_vertices} post vertices')
 
     print('Creating following edges...')
     following_edges = conn.upsertEdgeDataFrame(
@@ -74,6 +77,8 @@ def upsert_frames_to_tigergraph(users, following, posts):
         attributes={ 'connect_day': 'date' }
     )
 
+    print(f'Done. Upserted {following_edges} following edges')
+
     print('Creating post edges...')
     post_edges = conn.upsertEdgeDataFrame(
         df=posts,
@@ -84,6 +89,8 @@ def upsert_frames_to_tigergraph(users, following, posts):
         to_id='line_id',
         attributes={ 'created_at': 'created_at' }
     )
+
+    print(f'Done. Upserted {post_edges} post edges')
 
     return {
         'user_vertices': user_vertices,
