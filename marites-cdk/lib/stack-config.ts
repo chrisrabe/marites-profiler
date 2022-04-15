@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { Duration } from "aws-cdk-lib";
 
 const config = {
@@ -10,7 +11,7 @@ const config = {
   minUserPolicies: ["ComprehendFullAccess"],
   // Lambda environment variables
   tgHost: process.env.TG_HOST,
-  tgPassword: process.env.TG_PASSWORD
+  tgPassword: process.env.TG_PASSWORD,
 };
 
 export default config;
