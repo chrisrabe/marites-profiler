@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { Duration } from "aws-cdk-lib";
 
 const config = {
@@ -8,6 +9,10 @@ const config = {
   // IAM configuration
   initialUsers: ["marites-user"],
   minUserPolicies: ["ComprehendFullAccess"],
+  // Lambda environment variables
+  tgHost: process.env.TG_HOST,
+  tgPassword: process.env.TG_PASSWORD,
+  tgSecret: process.env.TG_SECRET,
 };
 
 export default config;

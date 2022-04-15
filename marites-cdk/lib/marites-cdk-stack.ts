@@ -51,6 +51,12 @@ export class MaritesCdkStack extends Stack {
 
     // Create internal lambda functions
 
+    const transformEnv = {
+      TG_HOST: config.tgHost ?? "",
+      TG_PASSWORD: config.tgPassword ?? "",
+      TG_SECRET: config.tgSecret ?? "",
+    };
+
     this.createLambdaFunction(
       "input-transform",
       path.join(functionsDir, "input-transform"),
@@ -58,9 +64,10 @@ export class MaritesCdkStack extends Stack {
       [
         new S3EventSource(inputBucket, {
           events: [EventType.OBJECT_CREATED_PUT],
-          filters: [{ prefix: "tigergraph/", suffix: ".csv" }],
+          filters: [{ prefix: "tigergraph/", suffix: ".tar.gz" }],
         }),
-      ]
+      ],
+      transformEnv
     );
 
     this.createLambdaFunction(
@@ -72,7 +79,8 @@ export class MaritesCdkStack extends Stack {
           events: [EventType.OBJECT_CREATED_PUT],
           filters: [{ suffix: ".tar.gz" }],
         }),
-      ]
+      ],
+      transformEnv
     );
   }
 
@@ -81,6 +89,7 @@ export class MaritesCdkStack extends Stack {
     codePath: string,
     role: IAMRole,
     events?: IEventSource[],
+    environment?: Record<string, string>,
     handler = "index.handler"
   ) {
     return new LambdaFunction(this, id, {
@@ -98,6 +107,7 @@ export class MaritesCdkStack extends Stack {
       }),
       role,
       events,
+      environment,
     });
   }
 
@@ -105,12 +115,20 @@ export class MaritesCdkStack extends Stack {
     inputBucket: S3Bucket,
     outputBucket: S3Bucket
   ) {
+    const policies = config.minUserPolicies.map((policy) =>
+      ManagedPolicy.fromAwsManagedPolicyName(policy)
+    );
+
+    policies.push(
+      ManagedPolicy.fromAwsManagedPolicyName(
+        "service-role/AWSLambdaBasicExecutionRole"
+      )
+    );
+
     const lambdaRole = new IAMRole(this, "marites-lambda-role", {
       roleName: "Role-Lambda-Marites",
       assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-      managedPolicies: config.minUserPolicies.map((policy) =>
-        ManagedPolicy.fromAwsManagedPolicyName(policy)
-      ),
+      managedPolicies: policies,
     });
 
     inputBucket.grantReadWrite(lambdaRole);
