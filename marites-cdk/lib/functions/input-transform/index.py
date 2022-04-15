@@ -18,6 +18,7 @@ s3 = boto3.client('s3')
 tg_graph = "marites"
 tg_host = os.environ.get("TG_HOST")
 tg_password = os.environ.get("TG_PASSWORD")
+tg_secret = os.environ.get("TG_SECRET")
 
 def get_frames_from_s3(bucket, s3_key):
     s3 = boto3.client('s3')
@@ -27,21 +28,24 @@ def get_frames_from_s3(bucket, s3_key):
     tar = tarfile.open(fileobj=BytesIO(input_tar_content))
 
     frames = {}
-    
+
     for tar_resource in tar:
         filename = tar_resource.name
         key = re.search('(.*)/(.*).csv', filename).group(2)
         df = pd.read_csv(tar.extractfile(tar_resource), header=0)
         frames[key] = df
+    
+    tar.close()
 
     return frames
 
 def upsert_frames_to_tigergraph(users, following, posts):
     # Create tigergraph connection
-    conn = tg.TigerGraphConnection(host=tg_host, graphname=tg_graph, password=tg_password)
-    secret = conn.createSecret()
-    conn.getToken(secret=secret)
+    print('Connecting to Tigergraph...')
+    token = tg.TigerGraphConnection(host=tg_host, graphname=tg_graph).getToken(tg_secret)[0]
+    conn = tg.TigerGraphConnection(host=tg_host, graphname=tg_graph, password=tg_password, apiToken=token)
 
+    print('Creating user vertices...')
     user_vertices = conn.upsertVertexDataFrame(
         df=users,
         vertexType='user',
@@ -52,12 +56,14 @@ def upsert_frames_to_tigergraph(users, following, posts):
         }
     )
 
+    print('Creating post vertices...')
     post_vertices = conn.upsertVertexDataFrame(
         df=posts,
         vertexType='post',
         v_id='line_id'
     )
 
+    print('Creating following edges...')
     following_edges = conn.upsertEdgeDataFrame(
         df=following,
         sourceVertexType='user',
@@ -68,6 +74,7 @@ def upsert_frames_to_tigergraph(users, following, posts):
         attributes={ 'connect_day': 'date' }
     )
 
+    print('Creating post edges...')
     post_edges = conn.upsertEdgeDataFrame(
         df=posts,
         sourceVertexType='user',
@@ -90,11 +97,15 @@ def handler(event, context):
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'], encoding='utf-8')
 
+    print(f'Extracting {key} from ${bucket}')
+
     try:
         input_frames = get_frames_from_s3(bucket, key)
         following = input_frames['following']
         users = input_frames['users']
         posts = input_frames['posts']
+        
+        print('Extracted input frames: users ({}), following ({}), posts ({})'.format(users.shape[0], following.shape[0], posts.shape[0]))
 
         resp = upsert_frames_to_tigergraph(users, following, posts)
 

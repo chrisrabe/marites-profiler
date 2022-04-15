@@ -54,6 +54,7 @@ export class MaritesCdkStack extends Stack {
     const transformEnv = {
       TG_HOST: config.tgHost ?? "",
       TG_PASSWORD: config.tgPassword ?? "",
+      TG_SECRET: config.tgSecret ?? "",
     };
 
     this.createLambdaFunction(
@@ -114,12 +115,20 @@ export class MaritesCdkStack extends Stack {
     inputBucket: S3Bucket,
     outputBucket: S3Bucket
   ) {
+    const policies = config.minUserPolicies.map((policy) =>
+      ManagedPolicy.fromAwsManagedPolicyName(policy)
+    );
+
+    policies.push(
+      ManagedPolicy.fromAwsManagedPolicyName(
+        "service-role/AWSLambdaBasicExecutionRole"
+      )
+    );
+
     const lambdaRole = new IAMRole(this, "marites-lambda-role", {
       roleName: "Role-Lambda-Marites",
       assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-      managedPolicies: config.minUserPolicies.map((policy) =>
-        ManagedPolicy.fromAwsManagedPolicyName(policy)
-      ),
+      managedPolicies: policies,
     });
 
     inputBucket.grantReadWrite(lambdaRole);

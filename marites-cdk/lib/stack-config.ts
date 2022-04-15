@@ -12,6 +12,7 @@ const config = {
   // Lambda environment variables
   tgHost: process.env.TG_HOST,
   tgPassword: process.env.TG_PASSWORD,
+  tgSecret: process.env.TG_SECRET,
 };
 
 export default config;
