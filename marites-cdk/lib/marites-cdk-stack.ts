@@ -105,6 +105,8 @@ export class MaritesCdkStack extends Stack {
           ],
         },
       }),
+      timeout: config.lambdaTimeout,
+      retryAttempts: config.retryAttempts,
       role,
       events,
       environment,
