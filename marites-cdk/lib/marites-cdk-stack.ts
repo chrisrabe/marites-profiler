@@ -19,6 +19,7 @@ import {
   Runtime as LambdaRuntime,
 } from "aws-cdk-lib/aws-lambda";
 import { S3EventSource } from "aws-cdk-lib/aws-lambda-event-sources";
+import { RestApi, LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
 import config from "./stack-config";
 import * as path from "path";
 
@@ -56,6 +57,60 @@ export class MaritesCdkStack extends Stack {
       inputBucket,
       outputBucket
     );
+
+    // Create Serverless API
+    const api = new RestApi(this, "marites-api", {
+      restApiName: "Marites API",
+      description:
+        "This service serves endpoints for serving personalised content",
+    });
+
+    this.addApiEndpoint(
+      api,
+      "analyse",
+      ["POST"],
+      "analyse-handler",
+      path.join(functionsDir, "analyse"),
+      lambdaRole
+    );
+
+    this.addApiEndpoint(
+      api,
+      "user",
+      ["GET"],
+      "user-handler",
+      path.join(functionsDir, "user"),
+      lambdaRole
+    );
+
+    this.addApiEndpoint(
+      api,
+      "news",
+      ["GET"],
+      "news-handler",
+      path.join(functionsDir, "news"),
+      lambdaRole
+    );
+  }
+
+  private addApiEndpoint(
+    api: RestApi,
+    pathPart: string,
+    supportedMethods: string[],
+    id: string,
+    codePath: string,
+    lambdaRole: IAMRole
+  ) {
+    const lambdaFunction = this.createLambdaFunction(id, codePath, lambdaRole);
+    const integration = new LambdaIntegration(lambdaFunction, {
+      requestTemplates: {
+        "application/json": JSON.stringify({ statusCode: 200 }),
+      },
+    });
+    const endpoint = api.root.addResource(pathPart);
+    for (const method of supportedMethods) {
+      endpoint.addMethod(method, integration);
+    }
   }
 
   private createTransformFunctions(
@@ -74,26 +129,26 @@ export class MaritesCdkStack extends Stack {
       "input-transform",
       path.join(functionsDir, "input-transform"),
       lambdaRole,
+      transformEnv,
       [
         new S3EventSource(inputBucket, {
           events: [EventType.OBJECT_CREATED_PUT],
           filters: [{ prefix: "tigergraph/", suffix: ".tar.gz" }],
         }),
-      ],
-      transformEnv
+      ]
     );
 
     this.createLambdaFunction(
       "output-transform",
       path.join(functionsDir, "output-transform"),
       lambdaRole,
+      transformEnv,
       [
         new S3EventSource(outputBucket, {
           events: [EventType.OBJECT_CREATED_PUT],
           filters: [{ suffix: ".tar.gz" }],
         }),
-      ],
-      transformEnv
+      ]
     );
   }
 
@@ -101,11 +156,12 @@ export class MaritesCdkStack extends Stack {
     id: string,
     codePath: string,
     role: IAMRole,
-    events?: IEventSource[],
     environment?: Record<string, string>,
+    events?: IEventSource[],
     handler = "index.handler"
   ) {
     return new LambdaFunction(this, id, {
+      functionName: id,
       handler: handler,
       runtime: LambdaRuntime.PYTHON_3_9,
       code: LambdaCode.fromAsset(codePath, {
