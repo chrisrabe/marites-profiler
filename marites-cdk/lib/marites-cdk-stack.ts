@@ -59,36 +59,58 @@ export class MaritesCdkStack extends Stack {
     );
 
     // Create Serverless API
-    const analyseFunction = this.createLambdaFunction(
-      "analyse-handler",
-      path.join(functionsDir, "analyse"),
-      lambdaRole
-    );
-
-    const userFunction = this.createLambdaFunction(
-      "user-handler",
-      path.join(functionsDir, "user"),
-      lambdaRole
-    );
-
-    const newsFunction = this.createLambdaFunction(
-      "news-handler",
-      path.join(functionsDir, "news"),
-      lambdaRole
-    );
-
     const api = new RestApi(this, "marites-api", {
       restApiName: "Marites API",
       description:
         "This service serves endpoints for serving personalised content",
     });
 
-    const analyseIntegration = new LambdaIntegration(analyseFunction, {
+    this.addApiEndpoint(
+      api,
+      "analyse",
+      ["POST"],
+      "analyse-handler",
+      path.join(functionsDir, "analyse"),
+      lambdaRole
+    );
+
+    this.addApiEndpoint(
+      api,
+      "user",
+      ["GET"],
+      "user-handler",
+      path.join(functionsDir, "user"),
+      lambdaRole
+    );
+
+    this.addApiEndpoint(
+      api,
+      "news",
+      ["GET"],
+      "news-handler",
+      path.join(functionsDir, "news"),
+      lambdaRole
+    );
+  }
+
+  private addApiEndpoint(
+    api: RestApi,
+    pathPart: string,
+    supportedMethods: string[],
+    id: string,
+    codePath: string,
+    lambdaRole: IAMRole
+  ) {
+    const lambdaFunction = this.createLambdaFunction(id, codePath, lambdaRole);
+    const integration = new LambdaIntegration(lambdaFunction, {
       requestTemplates: {
         "application/json": JSON.stringify({ statusCode: 200 }),
       },
     });
-
+    const endpoint = api.root.addResource(pathPart);
+    for (const method of supportedMethods) {
+      endpoint.addMethod(method, integration);
+    }
   }
 
   private createTransformFunctions(
@@ -139,6 +161,7 @@ export class MaritesCdkStack extends Stack {
     handler = "index.handler"
   ) {
     return new LambdaFunction(this, id, {
+      functionName: id,
       handler: handler,
       runtime: LambdaRuntime.PYTHON_3_9,
       code: LambdaCode.fromAsset(codePath, {
