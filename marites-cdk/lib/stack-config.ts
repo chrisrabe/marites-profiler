@@ -13,9 +13,10 @@ const config = {
   lambdaTimeout: Duration.minutes(5),
   retryAttempts: 0,
   // Lambda environment variables
-  tgHost: process.env.TG_HOST,
-  tgPassword: process.env.TG_PASSWORD,
-  tgSecret: process.env.TG_SECRET,
+  tgHost: process.env.TG_HOST ?? '',
+  tgPassword: process.env.TG_PASSWORD ?? '',
+  tgSecret: process.env.TG_SECRET ?? '',
+  twitterToken: process.env.BEARER_TOKEN ?? '',
 };
 
 export default config;

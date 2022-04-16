@@ -19,7 +19,12 @@ import {
   Runtime as LambdaRuntime,
 } from "aws-cdk-lib/aws-lambda";
 import { S3EventSource } from "aws-cdk-lib/aws-lambda-event-sources";
-import { RestApi, LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
+import {
+  RestApi,
+  LambdaIntegration,
+  LambdaIntegrationOptions,
+  MethodOptions,
+} from "aws-cdk-lib/aws-apigateway";
 import config from "./stack-config";
 import * as path from "path";
 
@@ -44,9 +49,10 @@ export class MaritesCdkStack extends Stack {
       outputBucket,
     ]);
 
-    dataAccessRole.grantPassRole(devGroup);
-
     const lambdaRole = this.createLambdaServiceRole(inputBucket, outputBucket);
+
+    dataAccessRole.grantPassRole(devGroup);
+    dataAccessRole.grantPassRole(lambdaRole);
 
     const functionsDir = path.join(__dirname, "functions");
 
@@ -71,7 +77,40 @@ export class MaritesCdkStack extends Stack {
       ["POST"],
       "analyse-handler",
       path.join(functionsDir, "analyse"),
-      lambdaRole
+      lambdaRole,
+      {
+        INPUT_BUCKET: config.inputBucketName,
+        OUTPUT_BUCKET: config.outputBucketName,
+        DATA_ACCESS_ROLE: dataAccessRole.roleArn,
+        BEARER_TOKEN: config.twitterToken,
+      },
+      {
+        requestParameters: {
+          "integration.request.header.X-Amz-Invocation-Type":
+            "method.request.header.InvocationType",
+        },
+        proxy: false,
+        integrationResponses: [
+          {
+            statusCode: "202",
+          },
+        ],
+        requestTemplates: {
+          "application/json": JSON.stringify({
+            body: "$util.escapeJavaScript($input.body)",
+          }),
+        },
+      },
+      {
+        requestParameters: {
+          "method.request.header.InvocationType": true,
+        },
+        methodResponses: [
+          {
+            statusCode: "202",
+          },
+        ],
+      }
     );
 
     this.addApiEndpoint(
@@ -99,14 +138,21 @@ export class MaritesCdkStack extends Stack {
     supportedMethods: string[],
     id: string,
     codePath: string,
-    lambdaRole: IAMRole
+    lambdaRole: IAMRole,
+    environment?: Record<string, string>,
+    integrationOptions?: LambdaIntegrationOptions,
+    methodOptions?: MethodOptions
   ) {
-    const lambdaFunction = this.createLambdaFunction(id, codePath, lambdaRole);
-    const integration = new LambdaIntegration(lambdaFunction, {
-      requestTemplates: {
-        "application/json": JSON.stringify({ statusCode: 200 }),
-      },
-    });
+    const lambdaFunction = this.createLambdaFunction(
+      id,
+      codePath,
+      lambdaRole,
+      environment
+    );
+    const integration = new LambdaIntegration(
+      lambdaFunction,
+      integrationOptions
+    );
     let endpoint = undefined;
     const parts = route.split("/");
     for (const part of parts) {
@@ -120,7 +166,7 @@ export class MaritesCdkStack extends Stack {
       return;
     }
     for (const method of supportedMethods) {
-      endpoint.addMethod(method, integration);
+      endpoint.addMethod(method, integration, methodOptions);
     }
   }
 
@@ -131,9 +177,9 @@ export class MaritesCdkStack extends Stack {
     outputBucket: S3Bucket
   ) {
     const transformEnv = {
-      TG_HOST: config.tgHost ?? "",
-      TG_PASSWORD: config.tgPassword ?? "",
-      TG_SECRET: config.tgSecret ?? "",
+      TG_HOST: config.tgHost,
+      TG_PASSWORD: config.tgPassword,
+      TG_SECRET: config.tgSecret,
     };
 
     this.createLambdaFunction(
