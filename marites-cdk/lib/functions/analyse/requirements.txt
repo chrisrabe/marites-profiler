@@ -1,1 +1,5 @@
 boto3
+python-dotenv
+uuid
+requests
+pandas

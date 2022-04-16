@@ -71,7 +71,13 @@ export class MaritesCdkStack extends Stack {
       ["POST"],
       "analyse-handler",
       path.join(functionsDir, "analyse"),
-      lambdaRole
+      lambdaRole,
+      {
+        INPUT_BUCKET: config.inputBucketName,
+        OUTPUT_BUCKET: config.outputBucketName,
+        DATA_ACCESS_ROLE: dataAccessRole.roleArn,
+        BEARER_TOKEN: config.twitterToken,
+      }
     );
 
     this.addApiEndpoint(
@@ -99,9 +105,15 @@ export class MaritesCdkStack extends Stack {
     supportedMethods: string[],
     id: string,
     codePath: string,
-    lambdaRole: IAMRole
+    lambdaRole: IAMRole,
+    environment?: Record<string, string>
   ) {
-    const lambdaFunction = this.createLambdaFunction(id, codePath, lambdaRole);
+    const lambdaFunction = this.createLambdaFunction(
+      id,
+      codePath,
+      lambdaRole,
+      environment
+    );
     const integration = new LambdaIntegration(lambdaFunction, {
       requestTemplates: {
         "application/json": JSON.stringify({ statusCode: 200 }),
@@ -131,9 +143,9 @@ export class MaritesCdkStack extends Stack {
     outputBucket: S3Bucket
   ) {
     const transformEnv = {
-      TG_HOST: config.tgHost ?? "",
-      TG_PASSWORD: config.tgPassword ?? "",
-      TG_SECRET: config.tgSecret ?? "",
+      TG_HOST: config.tgHost,
+      TG_PASSWORD: config.tgPassword,
+      TG_SECRET: config.tgSecret,
     };
 
     this.createLambdaFunction(
