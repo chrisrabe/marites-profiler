@@ -5,7 +5,6 @@ import boto3
 import tarfile
 import requests
 import pandas as pd
-from uuid import uuid4
 from datetime import datetime
 from dotenv import load_dotenv
 from io import StringIO, BytesIO
@@ -58,10 +57,10 @@ def map_tweets_to_post(raw_data):
     tweets = raw_data['data']
     username = raw_data['includes']['users'][0]['username']
     ref_tweets = { tweet['id']: tweet['text'] for tweet in raw_data['includes']['tweets'] } if 'includes' in raw_data and 'tweets' in raw_data['includes'] else {}
-    
+
     results = []
     for t in tweets:
-        post = { 
+        post = {
             'tweet_id': t['id'],
             'username': username,
             'created_at': t['created_at']
@@ -78,7 +77,7 @@ def map_tweets_to_post(raw_data):
             post['text'] = t['text']
 
         results.append(post)
-    
+
     return results
 
 def fetch_tweets_by_username(username):
@@ -125,7 +124,7 @@ def get_user_following_map(user, following):
     date = datetime.now().strftime("%m-%d-%y")
     username = user['username']
     follow_names = list(map(lambda x: x['username'], following))
-    
+
     return pd.DataFrame({
         'user': [username] * len(following),
         'following': follow_names,
@@ -134,7 +133,7 @@ def get_user_following_map(user, following):
 
 def clean_posts(data):
     user_tweets = data
-    
+
     # Clean up the links from the text (they're useless to us)
     user_tweets['text'] = user_tweets['text'].apply(lambda x: re.split('https:\/\/.*', str(x))[0])
 
@@ -147,7 +146,7 @@ def clean_posts(data):
     # Ensure that all text is in a single line
     user_tweets.text = user_tweets.text.str.replace('\n', ' ');
     user_tweets.text = user_tweets.text.str.replace('\r', ' ');
-    
+
     return user_tweets
 
 def extract_twitter_data(username):
@@ -157,13 +156,13 @@ def extract_twitter_data(username):
 
     users_list.append(user)
     users_list.extend(user_following)
-    
+
     users_to_search = list(map(lambda x: x['username'], users_list))
-    
+
     posts_df = get_user_tweets(users_to_search)
     following_df = get_user_following_map(user, user_following) # user -> following edges
     users_df = pd.DataFrame(users_list) # users vertex
-    
+
     return {
         'posts': clean_posts(posts_df),
         'following': following_df,
@@ -180,27 +179,27 @@ def upload_text_to_s3(data, bucket_name, file_name):
 
 def upload_frames_to_s3(tar_filename, bucket_name, frame_dict):
     tar_buffer = BytesIO()
-    
+
     # Create a tarfile into which frames can be added
     with tarfile.open(fileobj=tar_buffer, mode='w:gz') as tfo:
-        
+
         # Loop over all dataframes to be saved
         for file_name, df in frame_dict.items():
-            
+
             # Compute the full path of the output file within the archive
             archive_name = os.path.join('output', file_name)
-            
+
             # Create a temporary directory for packaging into a tar_file
             with TemporaryDirectory(prefix='rev_processing__') as temp_dir:
-                
+
                 # Write a csv dump of the dataframe to a temporary file
                 temp_file_name = os.path.join(temp_dir, archive_name)
                 os.makedirs(os.path.dirname(temp_file_name), exist_ok=True)
                 df.to_csv(temp_file_name, index=False)
-                
+
                 # Add the temp file to the tarfile
                 tfo.add(temp_file_name, arcname=archive_name)
-    
+
     # Upload to S3
     s3_resource = boto3.resource('s3')
     return s3_resource.Object(bucket_name, f'{tar_filename}.tar.gz').put(Body=tar_buffer.getvalue())
@@ -218,11 +217,11 @@ def start_targeted_sentiment_job(input_s3_url, output_s3_url, job_tag):
     }
 
     job_name = 'Targeted_Sentiment_Job_{}'.format(job_tag)
-    
+
     comprehend = boto3.client('comprehend', region_name=region)
     return comprehend.start_targeted_sentiment_detection_job(InputDataConfig=input_data_config,
-                                                             OutputDataConfig=output_data_config, 
-                                                             DataAccessRoleArn=data_access_role_arn, 
+                                                             OutputDataConfig=output_data_config,
+                                                             DataAccessRoleArn=data_access_role_arn,
                                                              LanguageCode=language_code,
                                                              JobName=job_name)
 
@@ -230,7 +229,7 @@ def start_targeted_sentiment_job(input_s3_url, output_s3_url, job_tag):
 def analyse_tweets(username, request_id):
     date = datetime.now().strftime("%m-%d-%y")
     tag = "{}-{}".format(date, username)
-    
+
     twitter_data = extract_twitter_data(username)
 
     posts = twitter_data['posts']
@@ -238,7 +237,7 @@ def analyse_tweets(username, request_id):
 
     following = twitter_data['following']
     users = twitter_data['users']
-    
+
     session_folder = '{}/{}'.format(request_id, username)
     tg_folder = '{}/{}'.format(tg_input_folder, session_folder) # Tigergraph files
     comp_folder = '{}/{}'.format(comprehend_input_folder, session_folder) # Comprehend files
@@ -246,11 +245,11 @@ def analyse_tweets(username, request_id):
     posts_filename = 'posts'
     following_filename = 'following'
     users_filename = 'users'
-    
+
     # Upload data to Comprehend input folder
     print("Uploading comprehend input files...")
     upload_text_to_s3(posts, input_bucket, '{}/{}_{}'.format(comp_folder, posts_filename, tag))
-    
+
     print("Uploading Tigergraph input files...")
     # Upload data to Tigergraph input folder
     uploaded_frames = {
@@ -259,15 +258,15 @@ def analyse_tweets(username, request_id):
         f'{posts_filename}.csv': posts
     }
     upload_frames_to_s3(tg_folder, input_bucket, uploaded_frames)
-    
+
     print("Starting comprehend job...")
     # Start comprehend job
     input_s3_url = 's3://{}/{}'.format(input_bucket, comp_folder)
     output_s3_url = 's3://{}/{}'.format(output_bucket, session_folder)
     return start_targeted_sentiment_job(input_s3_url, output_s3_url, tag)
 
-def handler(event):
-    request_id = uuid4()
+def handler(event, context):
+    request_id = context.aws_request_id
     body = json.loads(event['body'])
 
     if 'username' not in body:
@@ -277,7 +276,7 @@ def handler(event):
         }
 
     username = body['username']
-    
+
     try:
         response = analyse_tweets(username, request_id)
         job_id = response['JobId']
@@ -288,10 +287,21 @@ def handler(event):
                 'Content-Type': 'application/json'
             },
             'body': json.dumps({
+                'requestId': request_id,
                 'jobId': job_id,
                 'jobStatus': job_status
-            })
+            }),
+            'isBase64Encoded': False
         }
     except Exception as e:
         print(e)
-        raise e
+        return {
+            'statusCode': 500,
+            'body': json.dumps({
+                'message': str(e)
+            }),
+            'headers': {
+                'Content-Type': 'application/json'
+            },
+            'isBase64Encoded': False
+        }

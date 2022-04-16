@@ -4,5 +4,6 @@ def handler(event, context):
         'headers': {
             'Content-Type': 'application/json'
         },
-        'body': 'Success!'
+        'body': 'Success!',
+        'isBase64Encoded': False
     }

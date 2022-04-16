@@ -44,9 +44,10 @@ export class MaritesCdkStack extends Stack {
       outputBucket,
     ]);
 
-    dataAccessRole.grantPassRole(devGroup);
-
     const lambdaRole = this.createLambdaServiceRole(inputBucket, outputBucket);
+
+    dataAccessRole.grantPassRole(devGroup);
+    dataAccessRole.grantPassRole(lambdaRole);
 
     const functionsDir = path.join(__dirname, "functions");
 
@@ -77,6 +78,13 @@ export class MaritesCdkStack extends Stack {
         OUTPUT_BUCKET: config.outputBucketName,
         DATA_ACCESS_ROLE: dataAccessRole.roleArn,
         BEARER_TOKEN: config.twitterToken,
+      },
+      {
+        "integration.request.header.X-Amz-Invocation-Type":
+          "method.request.header.InvocationType",
+      },
+      {
+        "method.request.header.InvocationType": true,
       }
     );
 
@@ -106,7 +114,9 @@ export class MaritesCdkStack extends Stack {
     id: string,
     codePath: string,
     lambdaRole: IAMRole,
-    environment?: Record<string, string>
+    environment?: Record<string, string>,
+    integrationParameters?: Record<string, string>,
+    methodParameters?: Record<string, boolean>
   ) {
     const lambdaFunction = this.createLambdaFunction(
       id,
@@ -115,6 +125,7 @@ export class MaritesCdkStack extends Stack {
       environment
     );
     const integration = new LambdaIntegration(lambdaFunction, {
+      requestParameters: integrationParameters,
       requestTemplates: {
         "application/json": JSON.stringify({ statusCode: 200 }),
       },
@@ -132,7 +143,9 @@ export class MaritesCdkStack extends Stack {
       return;
     }
     for (const method of supportedMethods) {
-      endpoint.addMethod(method, integration);
+      endpoint.addMethod(method, integration, {
+        requestParameters: methodParameters,
+      });
     }
   }
 
