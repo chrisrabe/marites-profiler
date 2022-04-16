@@ -12,7 +12,8 @@
 
 ### What is personalisation?
 
-Personalisation refers to the process of businesses or websites tailoring their offerings based on a user's preference. [It is proven to provide many benefits](https://blog.useproof.com/9-benefits-of-website-personalization) for businesses and their customers. It can result in better conversions, improved customer loyalty, better user experience, increased sales, and higher retention. 
+Personalisation refers to the action of tailoring a business' content or offerings
+offerings or content based on an individual's preference. [It is proven to provide many benefits for businesses and their customers](https://blog.useproof.com/9-benefits-of-website-personalization). It can result in better conversions, improved customer loyalty, better user experience, increased sales, and higher retention. 
 
 Most businesses approach personalisation in two ways; historical based personalisation and session based personalisation. 
 
@@ -23,16 +24,23 @@ Session based personalisation is when applications provide recommendations based
 Businesses generally use a combination of both to reap its benefits. Personalisation is generally applied to businesses which involves some form of advertising on their content or products. Examples of this are news websites, social media websites, blogs or e-commerce applications.
 
 ### The problem
-_Personalisation take long when users don't spend enough time using the application._ At the time of writing this, I currently work as a full stack engineer in a global travel industry company. During my time working there, I learnt that timing is an extremely important factor to generating sales. We need to be able to present the right content at the right time to attract user interest.
+>_Personalisation takes long when users don't spend enough time using the application._ 
 
-We recently released a new feature which allows users to register for our site to receive travel recommendations and rewards. Our current recommendations are based on marketers' research. This currently generates sales but adding a personalisation capability may theoretically yield better results.
+At the time of writing this, I currently work as a full stack engineer in a global travel industry company. We recently released a new feature which allows users to register for our site to receive travel recommendations and rewards. 
+
+Our current recommendations are based on marketers' research, however it can be overwhelming for the users due to the large number of deals we possess. We could theoretically yield higher sales if our recommendations are personalised to the user. The problem is that we can't obtain data fast enough to match the rapidly changing nature of our product deals.
 
 ### The solution
-In this hackathon, I wanted to explore whether it's possible to personalise a user's experience **as soon as they create their account**. Most companies generally address this by asking the user a long-winded questionnaire. I wanted to make sure that users also do not have to go through that process.
 
-At the time of writing this, [Amazon released a new feature for Amazon Comprehend called Targeted Sentimental Analysis](https://aws.amazon.com/blogs/machine-learning/extract-granular-sentiment-in-text-with-amazon-comprehend-targeted-sentiment/) last month. This feature uses NLP to extract key terms from a piece of text and the user's sentiment towards those terms.
+In this hackathon, I wanted to create a solution that can provide us data for personalisation **as soon as the user registers for our site**.
 
-My solution (the Marites Profiler) would use this new feature to determine the user's overall interest by analysing their Twitter posts and the posts of their followers. This data is placed into Tigergraph so that I can retrieve the relationships between users, their interests and related content in an efficient manner.
+Most companies address the gap in data by asking users questions about their preferences. Spotify and Twitter are examples of this. This process can be a very long and tedious process for the users.
+
+My solution (the Marites Profiler) would use [Amazon's new Targeted Sentiment Analysis feature](https://aws.amazon.com/blogs/machine-learning/extract-granular-sentiment-in-text-with-amazon-comprehend-targeted-sentiment/) to determine the user's overall interest by analysing their Twitter posts and the posts of their followers. 
+
+The data collected from the analysis are placed into Tigergraph so that I can retrieve the relationships between users, their interests and related content in an efficient manner.
+
+Please refer to the [architecture](#architecture) section to see more technical details.
 
 ## <a name="getting-started"></a>Getting Started
 
@@ -76,20 +84,24 @@ TG_PASSWORD=XXX # tigergraph password
 
 **For this step, you need to make sure that your AWS CLI is configured to an admin account beforehand**
 
-1. Go into the `marites-cdk` folder
+1. Go into the `marites-cdk` folder `cd marites-cdk`
 2. Install dependencies `npm install`
-3. Create the CDK cloud formation templates using `npm run cdk -- synth`
-4. Deploy the initial stack `npm run cdk -- deploy` *note: if this fails, delete the MaritesCDK stack for your region in cloud formation then restart
-5. Grab a cup of coffee or tea (deployment takes a while - roughly 5 minutes)
-6. Inside `marites-cdk` create a `.env` file with the following contents:
+3. Create a `.env` file with the following contents:
 ```
 BEARER_TOKEN=XXX # twitter bearer token
 TG_HOST=XXX # tigergraph host URL
 TG_PASSWORD=XXX # tigergraph password
 TG_SECRET=XXX # tigergraph secret
 ```
-7. Generate your cloud formation template with the new configuration `npm run cdk -- synth`
-8. Redeploy with the changes `npm run cdk -- deploy`
+4. Create the CDK cloud formation templates using `npm run cdk -- synth`
+5. Deploy the initial stack `npm run cdk -- deploy` *note: if this fails, delete the MaritesCDK stack for your region in cloud formation then restart
+6. Grab a cup of coffee or tea, or move into the next step (deployment takes a while - roughly 5 minutes)
+7. Once your deployment is completed, copy the api endpoint that's printed out in your terminal. This is the URL for your backend. The output looks something like this:
+```
+Outputs:
+MaritesCdkStack.maritesapiEndpointE0B8740E = https://<GUID>.execute-api.ap-southeast-2.amazonaws.com/prod/
+...
+```
 
 #### Step 3: Bypass Tigergraph free-tier service limits
 
@@ -118,18 +130,29 @@ WIP.
 
 ![Screen Shot 2022-04-15 at 6 20 34 pm](https://user-images.githubusercontent.com/11940900/163545496-dd6ee867-a5ef-43e9-bbca-554f01c1e4fe.png)
 
-- The frontend application communicates to the serverless functions through an API Gateway
+### Key Components
+|Component| Description|
+|:-------|:------------|
+|Frontend/UI|A NextJS application that displays news articles.|
+|Tigergraph|Used for storing a graph that relates users to posts and topics. This should also include business content more query options but decided that it's a future improvement. I was only after the pattern of retrieving user interest.|
+|AWS Comprehend| Used for extracting entities and sentiments about the entities from a list of posts|
+|S3 | Used to store inputs and outputs for AWS Comprehend and the transformation lambda functions. The input bucket would contain information that was retrieved from Twitter. The output bucket would contain information that was generated by AWS Comprehend.|
+|Internal Lambdas| Transforms data form the S3 bucket and pushes them to Tigergraph. I created one input and one output transformation function.|
+|Serverless API| Supports functions for retrieving user, analysing a user and retrieving content|
+|Twitter API|Social media source. In the future, this can be extended to use more social media websites.|
+|News API|Returns news articles based on queries passed from the frontend|
+|Heroku worker|Used to bypass Tigergraph service limits|
 
+### Logical Flow
+- The frontend application communicates to the serverless functions through an API Gateway
 - The API gateway supports three endpoints
     - POST /analyse -> to extract information about a user from Twitter
     - GET /user/:id -> to retrieve information about a user from Tigergraph
     - GET /news -> to retrieve aggregated news (note: this can be exchanged to other content)
-
-- When the user enters a new username from the Frontend, it first tries to retrieve the user and their interest from Tigergraph
-- If no results retrieved from Tigergraph, it sends a POST request to the analyse function and redirects the user to the home page
-- If the user has information but no followers, it uses the current information from Tigergraph to provide personalised experience
-- The user is repeatedly polled from the frontend every five minutes to ensure up-to-date information (in an actual environment, we probably don't want to do this because it increases AWS billing costs)
-
+- When the user enters a new username from the Frontend, it first tries to retrieve the user and their interest from Tigergraph.
+- If no results retrieved from Tigergraph, it sends a POST request to the analyse function and redirects the user to the home page.
+- If the user has information but no followers, it uses the current information from Tigergraph to provide personalised experience and sends a POST request to the analyse function to retrieve more information about the user.
+- The user is repeatedly polled from the frontend every five minutes to ensure up-to-date information (in an actual environment, we probably don't want to do this because it increases AWS billing costs. This action is probably done whenever the user logs into the website in a more realistic scenario.)
 - When a request is sent to the /analyse function, 
     - it retrieves all Twitter post of the specified user and its followers. 
     - it cleans the data that will be sent to Tigergraph and AWS Comprehend
@@ -137,10 +160,7 @@ WIP.
     - it sends the text buffer into the input S3 bucket for further analysis
     - it sends the posts, users and following into the input S3 bucket to send to Tigergraph
     - it starts a new AWS Comprehend Targeted Sentiment job
-
 - Pushing the CSVs into the input bucket would trigger a lambda function that's responsible for converting them to edges and vertices in Tigergraph
-
 - Once the AWS Comprehend job is completed, it would create a `output.tar.gz` file inside the output S3 bucket.
 - The new `.tar.gz` would trigger a lambda function that's responsible for converting targeted sentiment analysis results into edges and vertices in Tigergraph
-
 - News content is queried by keywords that's produced by the analysis
