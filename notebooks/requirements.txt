@@ -4,3 +4,4 @@ python-dotenv
 boto3
 pyTigerGraph
 uuid
+newsapi-python
