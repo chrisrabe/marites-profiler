@@ -76,7 +76,7 @@ export class MaritesCdkStack extends Stack {
 
     this.addApiEndpoint(
       api,
-      "user",
+      "user/{id}",
       ["GET"],
       "user-handler",
       path.join(functionsDir, "user"),
@@ -95,7 +95,7 @@ export class MaritesCdkStack extends Stack {
 
   private addApiEndpoint(
     api: RestApi,
-    pathPart: string,
+    route: string,
     supportedMethods: string[],
     id: string,
     codePath: string,
@@ -107,7 +107,18 @@ export class MaritesCdkStack extends Stack {
         "application/json": JSON.stringify({ statusCode: 200 }),
       },
     });
-    const endpoint = api.root.addResource(pathPart);
+    let endpoint = undefined;
+    const parts = route.split("/");
+    for (const part of parts) {
+      if (!endpoint) {
+        endpoint = api.root.addResource(part);
+      } else {
+        endpoint = endpoint.addResource(part);
+      }
+    }
+    if (!endpoint) {
+      return;
+    }
     for (const method of supportedMethods) {
       endpoint.addMethod(method, integration);
     }
