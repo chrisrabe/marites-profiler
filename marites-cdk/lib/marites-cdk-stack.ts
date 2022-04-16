@@ -95,6 +95,11 @@ export class MaritesCdkStack extends Stack {
             statusCode: "202",
           },
         ],
+        requestTemplates: {
+          "application/json": JSON.stringify({
+            body: "$util.escapeJavaScript($input.body)",
+          }),
+        },
       },
       {
         requestParameters: {

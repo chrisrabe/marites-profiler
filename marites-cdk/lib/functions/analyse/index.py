@@ -267,6 +267,7 @@ def analyse_tweets(username, request_id):
 
 def handler(event, context):
     request_id = context.aws_request_id
+    print(event)
     body = json.loads(event['body'])
 
     if 'username' not in body:
