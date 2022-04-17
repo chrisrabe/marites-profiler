@@ -80,7 +80,11 @@ TG_PASSWORD=XXX # tigergraph password
 ```
 3. Install all dependencies `pip install -r requirements.txt`
 4. Run the `setup-graph.py` script - `python3 setup-graph.py`
-5. Create a [Tigergraph secret](https://docs.tigergraph.com/cloud/access-solution/rest-requests) and copy the value to a notepad somewhere
+5. Copy the secret that's printed at the end of the process. It shoud look something like this:
+```
+Query installation finished.
+Your secret: <SECRET_TO_COPY>
+```
 
 #### Step 2: Setting up AWS infrastructure
 
@@ -104,7 +108,7 @@ NEWS_API_KEY=XXXX # news api key
 7. Once your deployment is completed, copy the api endpoint that's printed out in your terminal. This is the URL for your backend. The output looks something like this:
 ```
 Outputs:
-MaritesCdkStack.maritesapiEndpointE0B8740E = https://<GUID>.execute-api.ap-southeast-2.amazonaws.com/prod/
+MaritesCdkStack.maritesapiEndpointE0B8740E = <AWS_API_GATEWAY_URL>
 ...
 ```
 

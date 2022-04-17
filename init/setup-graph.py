@@ -2,15 +2,19 @@ import pyTigerGraph as tg
 from dotenv import load_dotenv
 import os
 
+load_dotenv()
+
 tg_graph = "marites"
 tg_host = os.environ.get("TG_HOST")
 tg_password = os.environ.get("TG_PASSWORD")
 
+print(f"Connecting to TigerGraph: {tg_host}")
 conn = tg.TigerGraphConnection(host=tg_host, graphname=tg_graph, password=tg_password)
 
-# If uncommend you want to rebuild everything
-# print(conn.gsql('use global drop all'))
+# Uncomment if you want to rebuild everything
+print(conn.gsql('use global drop all'))
 
+# Create entire graph
 print(conn.gsql('''
 use global
 
@@ -28,7 +32,7 @@ create vertex post (
 create vertex topic (
     primary_id text string,
     text string,
-    type string
+    topic_type string
 )
 
 create directed edge following (from user, to user, connect_day string)
@@ -38,11 +42,27 @@ create undirected edge topic_sentiment (
     to topic,
     topic string,
     sentiment string,
-    positive_score double,
-    negative_score double,
-    neutral_score double,
-    mixed_score double
+    topic_type string
 )
 
 create graph marites(user, post, topic, following, created_post, topic_sentiment)
 '''))
+
+# Create and install queries
+print(conn.gsql('''
+use graph marites
+
+drop query get_following
+
+create query get_following(vertex<user> p) for graph marites {
+    start = {p};
+    tgt = select t from start:s-(following:e)-user:t;
+    print tgt;
+}
+
+install query get_following
+'''))
+
+# Generate secret
+secret = conn.createSecret()
+print(f'Your secret: {secret}')
