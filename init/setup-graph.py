@@ -12,9 +12,11 @@ print(f"Connecting to TigerGraph: {tg_host}")
 conn = tg.TigerGraphConnection(host=tg_host, graphname=tg_graph, password=tg_password)
 
 # Uncomment if you want to rebuild everything
+print("Dropping current data..")
 print(conn.gsql('use global drop all'))
 
 # Create entire graph
+print("Creating the Marites schema...")
 print(conn.gsql('''
 use global
 
@@ -36,8 +38,8 @@ create vertex topic (
 )
 
 create directed edge following (from user, to user, connect_day string)
-create undirected edge created_post (from user, to post, created_at datetime)
-create undirected edge topic_sentiment (
+create directed edge created_post (from user, to post, created_at datetime)
+create directed edge topic_sentiment (
     from post,
     to topic,
     topic string,
@@ -49,6 +51,7 @@ create graph marites(user, post, topic, following, created_post, topic_sentiment
 '''))
 
 # Create and install queries
+print("Creating queries...")
 print(conn.gsql('''
 use graph marites
 
@@ -64,5 +67,6 @@ install query get_following
 '''))
 
 # Generate secret
+print("Generating secret...")
 secret = conn.createSecret()
 print(f'Your secret: {secret}')

@@ -83,6 +83,7 @@ TG_PASSWORD=XXX # tigergraph password
 5. Copy the secret that's printed at the end of the process. It shoud look something like this:
 ```
 Query installation finished.
+Generating secret...
 Your secret: <SECRET_TO_COPY>
 ```
 
@@ -138,6 +139,14 @@ By default, the free version of Tigergraph comes with a [service limit](https://
 10. Go into settings and configure your environment variables
 
 ![Screen Shot 2022-04-15 at 6 16 52 pm](https://user-images.githubusercontent.com/11940900/163545193-55126d32-85db-4f03-bf39-281d2d303df8.png)
+
+### Cleaning up
+
+If you want to clean up everything, please follow these steps:
+1. Destroy your AWS infrastructure - `npm run cdk -- destroy`
+2. [Terminate your Tigergraph instance](https://docs.tigergraph.com/cloud/solutions/stop-restart-and-terminate)
+3. Remove the Heroku worker (if used)
+4. Remove the Marites UI (if deployed somewhere)
 
 11. Set environment variables for `TG_HOST` and `TG_PASSWORD`
 
