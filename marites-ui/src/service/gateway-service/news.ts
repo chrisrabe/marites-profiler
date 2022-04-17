@@ -12,7 +12,9 @@ export const getNewsArticles = async (
         keywords: keywords ? encodeURIComponent(keywords) : undefined,
       },
     });
-    return data;
+    return data.sort((a: NewsArticle, b: NewsArticle) =>
+      a.publishDate.localeCompare(b.publishDate)
+    );
   } catch (e) {
     console.log(e);
     return [];

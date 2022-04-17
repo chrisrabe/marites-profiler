@@ -3,6 +3,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { NewsArticle } from "types/newsArticle";
 import config from "config";
+import dayjs from "dayjs";
 
 interface NewsArticleProps {
   article: NewsArticle;
@@ -15,10 +16,11 @@ const NewsArticle: React.FC<NewsArticleProps> = ({ article }) => {
   const imageProxy = `https://res.cloudinary.com/demo/image/fetch/${imageSrc}`;
 
   return (
-    <motion.div
+    <motion.button
       whileHover={{ scale: 0.95 }}
       whileTap={{ scale: 0.9 }}
       className="cursor-pointer"
+      onClick={() => window.open(article.url, "_blank")?.focus()}
     >
       <div className="object-cover w-80 md:w-96 h-48 relative">
         <Image
@@ -36,10 +38,10 @@ const NewsArticle: React.FC<NewsArticleProps> = ({ article }) => {
           {article.title}
         </h3>
         <p className="absolute text-xs font-light text-gray-400 bottom-0">
-          {article.publishDate}
+          {dayjs(article.publishDate).format("D MMMM YYYY")}
         </p>
       </div>
-    </motion.div>
+    </motion.button>
   );
 };
 
