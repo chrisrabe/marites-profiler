@@ -23,7 +23,7 @@ const steps = [
   },
   {
     text: "This results in better user experience, higher retention, and instant customised recommendations.",
-    keywords: ["better user experience", "instant customised recommendations"],
+    keywords: ["better user experience", "instant customised recommendations", "higher retention"],
   },
   {
     text: "To get started, please enter your Twitter username",
