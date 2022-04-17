@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { NewsArticle } from "types/newsArticle";
@@ -9,8 +9,10 @@ interface NewsArticleProps {
 }
 
 const NewsArticle: React.FC<NewsArticleProps> = ({ article }) => {
-  const imageUrl = article.image ?? config.defaultImage;
-  const imageProxy = `https://res.cloudinary.com/demo/image/fetch/${imageUrl}`;
+  const [imageSrc, setImageSrc] = useState(
+    article.image ?? config.defaultImage
+  );
+  const imageProxy = `https://res.cloudinary.com/demo/image/fetch/${imageSrc}`;
 
   return (
     <motion.div
@@ -24,6 +26,9 @@ const NewsArticle: React.FC<NewsArticleProps> = ({ article }) => {
           layout="fill"
           alt="Sample image"
           objectFit="cover"
+          onError={() => {
+            setImageSrc(config.defaultImage);
+          }}
         />
       </div>
       <div className="flex flex-col mt-4 w-80 md:w-96 h-20 relative">

@@ -15,16 +15,10 @@ newscatcherapi = NewsCatcherApiClient(x_api_key=news_catcher_api_key)
 
 valid_image_formats = ['.jpg', '.png', '.jpeg']
 
-def validate_image(image_url):
-    if type(image_url) == str:
-        return image_url if any(image_url.endswith(format) for format in valid_image_formats) else ""
-    else:
-        return ""
-
 def map_to_standardised_format_news_api(article):
     return {
         'title': article['title'],
-        'image': validate_image(article['urlToImage']),
+        'image': article['urlToImage'],
         'description': article['description'],
         'url': article['url'],
         'publishDate': article['publishedAt']
@@ -33,7 +27,7 @@ def map_to_standardised_format_news_api(article):
 def map_to_standardised_format_newscatcher(article):
     return {
         'title': article['title'],
-        'image': validate_image(article['media']),
+        'image': article['media'],
         'description': article['summary'],
         'url': article['link'],
         'publishDate': article['published_date']
