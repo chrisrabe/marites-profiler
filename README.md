@@ -108,7 +108,17 @@ MaritesCdkStack.maritesapiEndpointE0B8740E = https://<GUID>.execute-api.ap-south
 ...
 ```
 
-#### Step 3: Bypass Tigergraph free-tier service limits
+#### Step 3: Set up your frontend
+
+1. Go inside the `marites-ui` folder
+2. Install all dependencies - `npm install`
+3. Create a new `.env.local` file with the following contents
+```
+API_GATEWAY_URL=XXXX # your API gateway url
+```
+4. Start the application locally - `npm run dev`
+
+#### Step 4: Bypass Tigergraph free-tier service limits (Optional)
 
 By default, the free version of Tigergraph comes with a [service limit](https://docs.tigergraph.com/cloud/reference/service-limits) where the instance automatically turns off after 1 hour of no activity, and deleted after 7 days of no activity. Users have to manually turn them on. This kinda sucks for demo purposes because you'd have to keep a vigilant eye on whether the instance is turned on. Luckily, [heroku workers](https://devcenter.heroku.com/articles/background-jobs-queueing) are here to save the day.
 
@@ -126,10 +136,6 @@ By default, the free version of Tigergraph comes with a [service limit](https://
 ![Screen Shot 2022-04-15 at 6 16 52 pm](https://user-images.githubusercontent.com/11940900/163545193-55126d32-85db-4f03-bf39-281d2d303df8.png)
 
 11. Set environment variables for `TG_HOST` and `TG_PASSWORD`
-
-#### Step 4: Set up your frontend
-
-WIP.
 
 ## <a name="architecture"></a>Architecture
 
