@@ -1,6 +1,7 @@
 export interface NewsArticle {
-  imageUrl: string;
   title: string;
-  date: string;
-  url?: string;
+  publishDate: string;
+  url: string;
+  image?: string;
+  description?: string;
 }

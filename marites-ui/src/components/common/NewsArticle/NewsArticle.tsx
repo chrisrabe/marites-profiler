@@ -1,14 +1,17 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { NewsArticle } from "types/newsArticle";
+import config from "config";
 
 interface NewsArticleProps {
-  imageUrl: string;
-  title: string;
-  date: string;
+  article: NewsArticle;
 }
 
-const NewsArticle: React.FC<NewsArticleProps> = ({ imageUrl, title, date }) => {
+const NewsArticle: React.FC<NewsArticleProps> = ({ article }) => {
+  const imageUrl = article.image ?? config.defaultImage;
+  const imageProxy = `https://res.cloudinary.com/demo/image/fetch/${imageUrl}`;
+
   return (
     <motion.div
       whileHover={{ scale: 0.95 }}
@@ -17,7 +20,7 @@ const NewsArticle: React.FC<NewsArticleProps> = ({ imageUrl, title, date }) => {
     >
       <div className="object-cover w-80 md:w-96 h-48 relative">
         <Image
-          src={imageUrl}
+          src={imageProxy}
           layout="fill"
           alt="Sample image"
           objectFit="cover"
@@ -25,10 +28,10 @@ const NewsArticle: React.FC<NewsArticleProps> = ({ imageUrl, title, date }) => {
       </div>
       <div className="flex flex-col mt-4 w-80 md:w-96 h-20 relative">
         <h3 className="text-base font-medium text-gray-300 line-clamp-2">
-          {title}
+          {article.title}
         </h3>
         <p className="absolute text-xs font-light text-gray-400 bottom-0">
-          {date}
+          {article.publishDate}
         </p>
       </div>
     </motion.div>
