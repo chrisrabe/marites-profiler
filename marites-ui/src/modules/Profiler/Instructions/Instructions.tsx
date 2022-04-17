@@ -18,11 +18,11 @@ const steps = [
     keywords: ["personalise your experience"],
   },
   {
-    text: "Our profiler can assist businesses in automating the personalisation processes.",
+    text: "Our profiler can assist businesses in automating the personalisation processes as soon as the user registers.",
     keywords: ["automating the personalisation processes"],
   },
   {
-    text: "This results in better user experience, and instant customised recommendations as soon as a user registers.",
+    text: "This results in better user experience, higher retention, and instant customised recommendations.",
     keywords: ["better user experience", "instant customised recommendations"],
   },
   {
