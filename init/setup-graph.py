@@ -56,6 +56,7 @@ print(conn.gsql('''
 use graph marites
 
 drop query get_following
+drop query get_user_topics
 
 create query get_following(vertex<user> p) for graph marites {
     start = {p};
@@ -63,6 +64,15 @@ create query get_following(vertex<user> p) for graph marites {
     print tgt;
 }
 
+create query get_user_topics(vertex<user> u) for graph marites {
+    start = {u};
+    all_topics = select t
+                 from user:s-(created_post>:cp)-post:p-(topic_sentiment>:ts)-topic:t
+                 where (ts.sentiment == "POSITIVE") and (t.topic_type == "ATTRIBUTE" or t.topic_type == "ORGANIZATION");
+    print all_topics;
+}
+
+install query get_user_topics
 install query get_following
 '''))
 
