@@ -128,7 +128,25 @@ export class MaritesCdkStack extends Stack {
       ["GET"],
       "news-handler",
       path.join(functionsDir, "news"),
-      lambdaRole
+      lambdaRole,
+      {
+        NEWS_API_KEY: config.newsApiKey,
+        NEWS_CATCHER_API_KEY: config.newsCatcherApiKey,
+      },
+      {
+        requestParameters: {
+          "integration.request.querystring.countryCode":
+            "method.request.querystring.countryCode",
+          "integration.request.querystring.keywords":
+            "method.request.querystring.keywords",
+        },
+      },
+      {
+        requestParameters: {
+          "method.request.querystring.countryCode": true,
+          "method.request.querystring.keywords": true,
+        },
+      }
     );
   }
 

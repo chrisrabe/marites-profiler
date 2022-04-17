@@ -5,3 +5,4 @@ boto3
 pyTigerGraph
 uuid
 newsapi-python
+newscatcherapi

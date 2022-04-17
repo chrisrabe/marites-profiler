@@ -53,6 +53,8 @@ Please refer to the [architecture](#architecture) section to see more technical 
 - [Installed AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html)
 - [Installed Docker Desktop](https://docs.docker.com/desktop/)
 - [Registered for Twitter API access and generated API key](https://developer.twitter.com/en/docs/twitter-api)
+- [News Catcher API Access](https://newscatcherapi.com/)
+- [News API Access](https://newsapi.org/docs/get-started)
 
 #### Optional
 _You need these if you want to keep your free-tier solution alive forever._
@@ -92,6 +94,9 @@ BEARER_TOKEN=XXX # twitter bearer token
 TG_HOST=XXX # tigergraph host URL
 TG_PASSWORD=XXX # tigergraph password
 TG_SECRET=XXX # tigergraph secret
+
+NEWS_CATCHER_API_KEY=XXXX # news catcher api key
+NEWS_API_KEY=XXXX # news api key
 ```
 4. Create the CDK cloud formation templates using `npm run cdk -- synth`
 5. Deploy the initial stack `npm run cdk -- deploy` *note: if this fails, delete the MaritesCDK stack for your region in cloud formation then restart
