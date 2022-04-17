@@ -4,6 +4,7 @@ import urllib.parse
 from dotenv import load_dotenv
 from newsapi import NewsApiClient
 from newscatcherapi import NewsCatcherApiClient
+import pandas as pd
 
 load_dotenv()
 
@@ -62,6 +63,11 @@ def get_articles(country_code, query):
     else:
         return get_articles_by_query(query, country_code)
 
+def get_unique_articles(articles):
+    df = pd.DataFrame(articles)
+    dedup = df.drop_duplicates(subset=['title'])
+    return dedup.to_dict('records')
+
 def handler(event, context):
     params = event['queryStringParameters']
     country_code = params['countryCode'] if 'countryCode' in params else 'AU'
@@ -69,12 +75,13 @@ def handler(event, context):
 
     try:
         articles = get_articles(country_code, query)
+        unique_articles = get_unique_articles(articles)
         return {
             'statusCode': 200,
             'headers': {
                 'Content-Type': 'application/json'
             },
-            'body': json.dumps(articles),
+            'body': json.dumps(unique_articles),
             'isBase64Encoded': False
         }
     except Exception as e:

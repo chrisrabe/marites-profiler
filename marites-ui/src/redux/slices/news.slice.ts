@@ -33,7 +33,6 @@ const newsSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchRecentNews.fulfilled, (state, action) => {
       state.isFetchingNews = false;
-      console.log(action.payload);
       state.recentNews = action.payload;
     });
     builder.addCase(fetchRecentNews.rejected, (state, action) => {
