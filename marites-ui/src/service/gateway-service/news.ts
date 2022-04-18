@@ -13,7 +13,7 @@ export const getNewsArticles = async (
       },
     });
     return data.sort((a: NewsArticle, b: NewsArticle) =>
-      a.publishDate.localeCompare(b.publishDate)
+      b.publishDate.localeCompare(a.publishDate)
     );
   } catch (e) {
     console.log(e);
