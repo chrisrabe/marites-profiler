@@ -9,7 +9,7 @@ export const getNewsArticles = async (
     const { data } = await http.get("/news", {
       params: {
         countryCode,
-        keywords: keywords ? encodeURIComponent(keywords) : undefined,
+        keywords,
       },
     });
     return data.sort((a: NewsArticle, b: NewsArticle) =>

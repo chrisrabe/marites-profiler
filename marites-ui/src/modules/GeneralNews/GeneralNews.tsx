@@ -22,7 +22,13 @@ const GeneralNews: React.FC<GeneralNewsProps> = ({
       fetchRecentNews();
       setHasFetched(true);
     }
-  }, [recentNews, hasFetched]);
+  }, [hasFetched]);
+
+  useEffect(() => {
+    if (!isFetchingUser && userInfo) {
+      fetchRecentNews(userInfo.interests);
+    }
+  }, [isFetchingUser, userInfo]);
 
   return (
     <Container>

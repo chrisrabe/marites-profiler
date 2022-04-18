@@ -14,12 +14,20 @@ const initialState: NewsState = {
 
 export const fetchRecentNews = createAsyncThunk(
   "news/fetchRecentNews",
-  async (_, thunkApi) => {
+  async ({ keywords }: { keywords?: string[] }, thunkApi) => {
     try {
+      // @TODO find a way to extend this to allow more keywords
+      // grab the first 20 items
       const countryCode = config.defaultCountryCode;
-      return await fetchJson<NewsArticle[]>(
-        `/api/news?countryCode=${countryCode}`
-      );
+      let url = `/api/news?countryCode=${countryCode}`;
+      if (keywords) {
+        let query =
+          keywords?.length > config.maxKeywords
+            ? keywords.slice(0, config.maxKeywords)
+            : keywords;
+        url += `&keywords=${encodeURIComponent(query.join(","))}`;
+      }
+      return await fetchJson<NewsArticle[]>(url);
     } catch (e) {
       thunkApi.rejectWithValue(e);
     }

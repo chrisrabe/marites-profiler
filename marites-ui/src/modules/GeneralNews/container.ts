@@ -14,8 +14,9 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  // @ts-ignore
-  fetchRecentNews: () => dispatch(fetchRecentNews()),
+  fetchRecentNews: (keywords?: string[]) =>
+    // @ts-ignore
+    dispatch(fetchRecentNews({ keywords })),
   // @ts-ignore
   fetchUser: (username: string) => dispatch(fetchUser({ username })),
 });
