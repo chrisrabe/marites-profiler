@@ -11,6 +11,7 @@ const GeneralNews: React.FC<GeneralNewsProps> = ({
   recentNews,
   fetchRecentNews,
   isFetchingNews,
+  isFetchingUser,
   currentUser,
   userInfo,
 }) => {
@@ -26,7 +27,13 @@ const GeneralNews: React.FC<GeneralNewsProps> = ({
   return (
     <Container>
       <AppLogo variant="news" />
-      {currentUser ? (
+      {isFetchingUser ? (
+        <div className="mx-4 my-12 md:mx-12 lg:mx-24 md:my-20 max-w-2xl">
+          <h2 className="text-4xl mb-3 font-light">
+            Please wait while we fetch your user!
+          </h2>
+        </div>
+      ) : currentUser ? (
         <UserWelcome username={currentUser} userInfo={userInfo} />
       ) : (
         <HeroContainer />
