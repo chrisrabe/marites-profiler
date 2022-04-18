@@ -26,7 +26,7 @@ pronouns = [
     'him',
     'her',
     'them',
-    'ours',
+    'our',
     'yours',
     'his',
     'hers',
