@@ -5,11 +5,14 @@ import NewsArticle from "components/common/NewsArticle";
 import { GeneralNewsProps } from "./container";
 import HeroContainer from "./HeroContainer";
 import Skeleton from "react-loading-skeleton";
+import UserWelcome from "./UserWelcome";
 
 const GeneralNews: React.FC<GeneralNewsProps> = ({
   recentNews,
   fetchRecentNews,
   isFetchingNews,
+  currentUser,
+  userInfo,
 }) => {
   const [hasFetched, setHasFetched] = useState(false);
 
@@ -23,7 +26,11 @@ const GeneralNews: React.FC<GeneralNewsProps> = ({
   return (
     <Container>
       <AppLogo variant="news" />
-      <HeroContainer />
+      {currentUser ? (
+        <UserWelcome username={currentUser} userInfo={userInfo} />
+      ) : (
+        <HeroContainer />
+      )}
       <div className="flex flex-col items-center lg:items-start">
         <h2 className="text-lg mb-4 font-medium">Recent News</h2>
         <div className="grid grid-flow-row auto-rows-max grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-x-4 gap-y-8">
