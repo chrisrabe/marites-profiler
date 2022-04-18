@@ -43,18 +43,30 @@ const UserWelcome: React.FC<UserWelcomeProps> = ({ userInfo, username }) => {
       </p>
       <div className="mb-8">
         {userInfo ? (
-          <div>
-            <p className="text-3xl mb-1 font-light text-gray-300">
-              Here are your personalised news!
-            </p>
-            <p className="text-3xl mb-4 font-light text-gray-300">
-              We picked up that you may like news about{" "}
-              <span className="font-medium text-red-500">
-                {displayedInterest},
-              </span>{" "}
-              and more!
-            </p>
-          </div>
+          userInfo.interests.length === 0 ? (
+            <div>
+              <p className="text-3xl mb-1 font-light text-gray-300">
+                Looks like we can&apos;t find anything about you.{" "}
+                <span className="font-medium text-red-500">
+                  Your account may be set to private.
+                </span>{" "}
+                It&apos;s okay though!
+              </p>
+            </div>
+          ) : (
+            <div>
+              <p className="text-3xl mb-1 font-light text-gray-300">
+                Here are your personalised news!
+              </p>
+              <p className="text-3xl mb-4 font-light text-gray-300">
+                We picked up that you may like news about{" "}
+                <span className="font-medium text-red-500">
+                  {displayedInterest},
+                </span>{" "}
+                and more!
+              </p>
+            </div>
+          )
         ) : (
           <div>
             <p className="text-3xl mb-1 font-light text-gray-300">
@@ -71,7 +83,7 @@ const UserWelcome: React.FC<UserWelcomeProps> = ({ userInfo, username }) => {
         )}
       </div>
       <div className="flex flex-col space-y-4">
-        {userInfo && (
+        {userInfo && userInfo.interests.length > 0 && (
           <div>
             <Button onClick={() => setIsOpen(true)}>
               <span>What else did you find?</span>
