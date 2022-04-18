@@ -1,8 +1,11 @@
 # Marites Profiler
 
+![Marites Pro](https://user-images.githubusercontent.com/11940900/163772818-28b068c8-c3ea-4f5d-9998-af11f5bf765e.png)
+
 - [About](#about)
 - [Getting started](#getting-started)
 - [Architecture](#architecture)
+- [Check out the demo!](https://marites-profiler.vercel.app/) (Live until May 30 2022)
 
 ## <a name="about"></a>About
 
@@ -10,31 +13,30 @@
 
 - [Chris Rabe](https://www.linkedin.com/in/chrisrabe1/)
 
-### What is personalisation?
+### What is personalisation and how is it currently approached?
 
-Personalisation refers to the action of tailoring a business' content or offerings
-offerings or content based on an individual's preference. [It is proven to provide many benefits for businesses and their customers](https://blog.useproof.com/9-benefits-of-website-personalization). It can result in better conversions, improved customer loyalty, better user experience, increased sales, and higher retention. 
+Personalisation refers to the action of tailoring a business' content or offerings based on an individual's preference. [It is proven to provide many benefits for businesses and their customers](https://blog.useproof.com/9-benefits-of-website-personalization). It can result in better conversions, improved customer loyalty, better user experience, increased sales, and higher retention. 
 
-Most businesses approach personalisation in two ways; historical based personalisation and session based personalisation. 
+Personalisation is generally achieved through recommender engines that uses two filtering approaches; [collaborative filtering or content-based filtering](https://www.appier.com/blog/what-is-a-recommendation-engine-and-how-does-it-work). 
 
-Historical based personalisation is when applications analyse the user's activity since their account was created to provide tailored recommendations. The more the user uses the application, the better the recommendations get. Music recommendations by Spotify is an example of this.
+Collaborative filtering focuses on collecting and analysing data on user behaviour, activities and preferences to predict what a person will like based on their similarity to other users. It makes decisions based on what they know about the users.
 
-Session based personalisation is when applications provide recommendations based on the user's activity in their current session. For example, whenever you're browsing items in Amazon, the website slowly starts recommending items that are based on what you've recently searched.
+Content-based filtering, on the other hand, works on the principle that if you like a particular item, you will also like this other item. This approach is generally based on the customer's preferences and a description of an item.
 
-Businesses generally use a combination of both to reap its benefits. Personalisation is generally applied to businesses which involves some form of advertising on their content or products. Examples of this are news websites, social media websites, blogs or e-commerce applications.
+Some businesses use the hybrid of the two approaches to reap the most benefits.
+
+Both algorithms can be used with [long term and short term data](https://session-based-recommenders.fastforwardlabs.com/). Short term (or session-based) data is gathered during a user's activity. Long term data is gathered throughout a user's lifetime.
 
 ### The problem
 >_Personalisation takes long when users don't spend enough time using the application._ 
 
-At the time of writing this, I currently work as a full stack engineer in a global travel industry company. We recently released a new feature which allows users to register for our site to receive travel recommendations and rewards. 
-
-Our current recommendations are based on marketers' research, however it can be overwhelming for the users due to the large number of deals we possess. We could theoretically yield higher sales if our recommendations are personalised to the user. The problem is that we can't obtain data fast enough to match the rapidly changing nature of our product deals.
+For recommender algorithms to become effective, they both need to gather a lot of data about their user. It just takes a long time to gather information about a user.
 
 ### The solution
 
-In this hackathon, I wanted to create a solution that can provide us data for personalisation **as soon as the user registers for our site**.
+In this hackathon, I wanted to create a solution that can provide us data for personalisation **as soon as the user registers for our site**. It was inspired by [this paper where a researcher used social media networks to perform more effective recommendations](https://www.researchgate.net/publication/304708336_Making_recommendations_by_integrating_information_from_multiple_social_networks).
 
-Most companies address the gap in data by asking users questions about their preferences. Spotify and Twitter are examples of this. This process can be a very long and tedious process for the users.
+Most companies address the initial gap in data by asking users questions about their preferences. Spotify and Twitter are examples of this. This process can be a very long and tedious process for the users and sometimes ineffective.
 
 My solution (the Marites Profiler) would use [Amazon's new Targeted Sentiment Analysis feature](https://aws.amazon.com/blogs/machine-learning/extract-granular-sentiment-in-text-with-amazon-comprehend-targeted-sentiment/) to determine the user's overall interest by analysing their Twitter posts and the posts of their followers. 
 
