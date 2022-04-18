@@ -1,1 +1,1 @@
-export { default } from "./Profiler";
+export { default } from "./container";

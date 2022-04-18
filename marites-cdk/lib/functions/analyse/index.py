@@ -134,6 +134,9 @@ def get_user_following_map(user, following):
 def clean_posts(data):
     user_tweets = data
 
+    if user_tweets.empty:
+        return []
+
     # Clean up the links from the text (they're useless to us)
     user_tweets['text'] = user_tweets['text'].apply(lambda x: re.split('https:\/\/.*', str(x))[0])
 

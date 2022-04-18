@@ -7,8 +7,9 @@ import Icon from "components/ui/Icon";
 import Instructions from "./Instructions";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
+import { ProfilerProps } from "./container";
 
-const Profiler: React.FC = () => {
+const Profiler: React.FC<ProfilerProps> = ({ fetchUser }) => {
   const {
     register,
     formState: { errors },
@@ -19,10 +20,10 @@ const Profiler: React.FC = () => {
 
   const onSubmit = useCallback(
     (data: Record<string, any>) => {
-      console.log(data);
-      router.push("/");
+      fetchUser(data.username);
+      router.push("/").then();
     },
-    [router]
+    [router, fetchUser]
   );
 
   return (
