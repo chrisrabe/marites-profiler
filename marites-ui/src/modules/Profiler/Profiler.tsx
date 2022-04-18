@@ -35,6 +35,7 @@ const Profiler: React.FC<ProfilerProps> = ({ fetchUser }) => {
           <input
             className="bg-white px-8 py-2 rounded border border-gray-300 outline-none text-gray-900 w-full max-w-xl text-center"
             placeholder="Enter twitter username"
+            autoComplete="off"
             {...register("username", { required: true })}
           />
           {errors.username && (
