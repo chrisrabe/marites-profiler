@@ -72,7 +72,7 @@ def upload_topics_to_tg(topics):
         df=topics,
         vertexType='topic',
         v_id='text',
-        attributes={ 'text': 'text', 'type': 'type' }
+        attributes={ 'text': 'text', 'topic_type': 'type' }
     )
 
     print(f'Done. Upserted {topic_vertices} topic vertices')
@@ -89,10 +89,7 @@ def upload_topics_to_tg(topics):
         attributes={
             'topic': 'text',
             'sentiment': 'sentiment',
-            'positive_score': 'positive_score',
-            'negative_score': 'negative_score',
-            'neutral_score': 'neutral_score',
-            'mixed_score': 'mixed_score'
+            'topic_type': 'type'
         }
     )
 

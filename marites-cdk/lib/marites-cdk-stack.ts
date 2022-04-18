@@ -119,7 +119,12 @@ export class MaritesCdkStack extends Stack {
       ["GET"],
       "user-handler",
       path.join(functionsDir, "user"),
-      lambdaRole
+      lambdaRole,
+      {
+        TG_HOST: config.tgHost,
+        TG_PASSWORD: config.tgPassword,
+        TG_SECRET: config.tgSecret,
+      }
     );
 
     this.addApiEndpoint(

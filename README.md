@@ -80,7 +80,12 @@ TG_PASSWORD=XXX # tigergraph password
 ```
 3. Install all dependencies `pip install -r requirements.txt`
 4. Run the `setup-graph.py` script - `python3 setup-graph.py`
-5. Create a [Tigergraph secret](https://docs.tigergraph.com/cloud/access-solution/rest-requests) and copy the value to a notepad somewhere
+5. Copy the secret that's printed at the end of the process. It shoud look something like this:
+```
+Query installation finished.
+Generating secret...
+Your secret: <SECRET_TO_COPY>
+```
 
 #### Step 2: Setting up AWS infrastructure
 
@@ -104,7 +109,7 @@ NEWS_API_KEY=XXXX # news api key
 7. Once your deployment is completed, copy the api endpoint that's printed out in your terminal. This is the URL for your backend. The output looks something like this:
 ```
 Outputs:
-MaritesCdkStack.maritesapiEndpointE0B8740E = https://<GUID>.execute-api.ap-southeast-2.amazonaws.com/prod/
+MaritesCdkStack.maritesapiEndpointE0B8740E = <AWS_API_GATEWAY_URL>
 ...
 ```
 
@@ -134,6 +139,14 @@ By default, the free version of Tigergraph comes with a [service limit](https://
 10. Go into settings and configure your environment variables
 
 ![Screen Shot 2022-04-15 at 6 16 52 pm](https://user-images.githubusercontent.com/11940900/163545193-55126d32-85db-4f03-bf39-281d2d303df8.png)
+
+### Cleaning up
+
+If you want to clean up everything, please follow these steps:
+1. Destroy your AWS infrastructure - `npm run cdk -- destroy`
+2. [Terminate your Tigergraph instance](https://docs.tigergraph.com/cloud/solutions/stop-restart-and-terminate)
+3. Remove the Heroku worker (if used)
+4. Remove the Marites UI (if deployed somewhere)
 
 11. Set environment variables for `TG_HOST` and `TG_PASSWORD`
 

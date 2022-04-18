@@ -2,15 +2,21 @@ import pyTigerGraph as tg
 from dotenv import load_dotenv
 import os
 
+load_dotenv()
+
 tg_graph = "marites"
 tg_host = os.environ.get("TG_HOST")
 tg_password = os.environ.get("TG_PASSWORD")
 
+print(f"Connecting to TigerGraph: {tg_host}")
 conn = tg.TigerGraphConnection(host=tg_host, graphname=tg_graph, password=tg_password)
 
-# If uncommend you want to rebuild everything
-# print(conn.gsql('use global drop all'))
+# Uncomment if you want to rebuild everything
+print("Dropping current data..")
+print(conn.gsql('use global drop all'))
 
+# Create entire graph
+print("Creating the Marites schema...")
 print(conn.gsql('''
 use global
 
@@ -28,21 +34,49 @@ create vertex post (
 create vertex topic (
     primary_id text string,
     text string,
-    type string
+    topic_type string
 )
 
 create directed edge following (from user, to user, connect_day string)
-create undirected edge created_post (from user, to post, created_at datetime)
-create undirected edge topic_sentiment (
+create directed edge created_post (from user, to post, created_at datetime)
+create directed edge topic_sentiment (
     from post,
     to topic,
     topic string,
     sentiment string,
-    positive_score double,
-    negative_score double,
-    neutral_score double,
-    mixed_score double
+    topic_type string
 )
 
 create graph marites(user, post, topic, following, created_post, topic_sentiment)
 '''))
+
+# Create and install queries
+print("Creating queries...")
+print(conn.gsql('''
+use graph marites
+
+drop query get_following
+drop query get_user_topics
+
+create query get_following(vertex<user> p) for graph marites {
+    start = {p};
+    tgt = select t from start:s-(following:e)-user:t;
+    print tgt;
+}
+
+create query get_user_topics(vertex<user> u) for graph marites {
+    start = {u};
+    all_topics = select t
+                 from user:s-(created_post>:cp)-post:p-(topic_sentiment>:ts)-topic:t
+                 where (ts.sentiment == "POSITIVE") and (t.topic_type == "ATTRIBUTE" or t.topic_type == "ORGANIZATION");
+    print all_topics;
+}
+
+install query get_user_topics
+install query get_following
+'''))
+
+# Generate secret
+print("Generating secret...")
+secret = conn.createSecret()
+print(f'Your secret: {secret}')
