@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { NewsArticle } from "types/newsArticle";
 import config from "config";
+import fetchJson from "../../service/fetchJson";
 
 interface NewsState {
   recentNews: NewsArticle[];
@@ -16,10 +17,9 @@ export const fetchRecentNews = createAsyncThunk(
   async (_, thunkApi) => {
     try {
       const countryCode = config.defaultCountryCode;
-      const resp = await fetch(`/api/news?countryCode=${countryCode}`).then(
-        (r) => r.json()
+      return await fetchJson<NewsArticle[]>(
+        `/api/news?countryCode=${countryCode}`
       );
-      return resp;
     } catch (e) {
       thunkApi.rejectWithValue(e);
     }
@@ -33,7 +33,7 @@ const newsSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchRecentNews.fulfilled, (state, action) => {
       state.isFetchingNews = false;
-      state.recentNews = action.payload;
+      state.recentNews = action.payload ?? [];
     });
     builder.addCase(fetchRecentNews.rejected, (state, action) => {
       state.isFetchingNews = false;
