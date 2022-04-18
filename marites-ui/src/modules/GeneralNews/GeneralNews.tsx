@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import AppLogo from "components/common/AppLogo";
 import Container from "components/common/Container";
 import NewsArticle from "components/common/NewsArticle";
@@ -11,9 +11,14 @@ const GeneralNews: React.FC<GeneralNewsProps> = ({
   fetchRecentNews,
   isFetchingNews,
 }) => {
+  const [hasFetched, setHasFetched] = useState(false);
+
   useEffect(() => {
-    fetchRecentNews();
-  }, [fetchRecentNews]);
+    if (!hasFetched && (!recentNews || recentNews.length == 0)) {
+      fetchRecentNews();
+      setHasFetched(true);
+    }
+  }, [recentNews, hasFetched]);
 
   return (
     <Container>
