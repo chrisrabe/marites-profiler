@@ -6,6 +6,7 @@ import { Dispatch } from "redux";
 
 const mapStateToProps = (state: RootState) => ({
   recentNews: state.news.recentNews,
+  isFetchingNews: state.news.isFetchingNews,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
