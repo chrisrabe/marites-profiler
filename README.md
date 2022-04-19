@@ -1,6 +1,6 @@
 # Marites Profiler
 
-![Marites Pro](https://user-images.githubusercontent.com/11940900/163772818-28b068c8-c3ea-4f5d-9998-af11f5bf765e.png)
+![Marites Pro (1)](https://user-images.githubusercontent.com/11940900/163926104-a38a3ac7-d3a3-4805-8c3a-6f2db05355ab.png)
 
 - [About](#about)
 - [Getting started](#getting-started)
