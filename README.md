@@ -66,12 +66,13 @@ _You need these if you want to keep your free-tier solution alive forever._
 
 ### Instructions
 
-Inside the repository, you should see four folders
+Inside the repository, you should see five folders
 
 1. init -> contains logic for the initial step for the set up
 2. marites-cdk -> contains the CDK stack for generating your AWS infrastructure
 3. marites-ui -> contains frontend code that's deployed to NextJS
-4. notebooks -> contains Jupyter notebooks I used to experiment and build my functions
+4. marites-worker -> contains code that pings TigerGraph every 30 minutes to prevent the instance from turning off
+5. notebooks -> contains Jupyter notebooks I used to experiment and build my functions
 
 #### Step 1: Set up your graph schema and secret
 1. Go into the `init` folder
