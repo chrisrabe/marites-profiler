@@ -37,6 +37,7 @@ const NewsArticle: React.FC<NewsArticleProps> = ({ article }) => {
           <Image
             src={imageProxy}
             layout="fill"
+            unoptimized
             alt="Sample image"
             objectFit="cover"
             onError={() => {
